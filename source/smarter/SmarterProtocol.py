@@ -461,7 +461,7 @@ class SmarterProtocol:
     CommandResetSettings      = 0x10
     CommandDeviceInfo         = 0x64
     CommandUpdate             = 0x6d
-    Command69                 = 0x69
+    CommandWifiStrength       = 0x69
 
     # wifi
     CommandWifiNetwork        = 0x05
@@ -589,7 +589,7 @@ class SmarterProtocol:
         CommandCoffeeHistory    : (False,True,[ResponseCoffeeHistory],"Get coffee machine history"),
         CommandHotplateOff      : (False,True,[ResponseCommandStatus],"Turn off hotplate"),
         CommandDeviceInfo       : (True,True,[ResponseDeviceInfo],"Get appliance info"),
-        Command69               : (True,True,[ResponseCommandStatus],"Working unknown command"),
+        CommandWifiStrength     : (True,True,[ResponseCommandStatus],"Set wifi strength"),
         CommandWifiFirmware     : (True,True,[ResponseWifiFirmware],"Get wifi firmware info"),
         CommandUpdate           : (True,True,[],"Appliance firmware update")
     }
@@ -632,7 +632,7 @@ class SmarterProtocol:
     # format: kettle?, coffee? (None is unnknown), minimal length (0 = variable), response to command, description
     ResponseMessages = {
         #incomplete? ... chech the first one...
-        ResponseCommandStatus   : (True,True,3,[CommandDeviceTime,CommandWifiNetwork,CommandWifiPassword,CommandResetSettings,CommandHeat,CommandKettleStop,CommandHeatFormula,CommandKettleStoreSettings,Command20,CommandHeatDefault,Command22,Command23,CommandBase,CommandCalibrate,Command69,CommandStoreTimer,CommandTimers,CommandDisableTimer,Command30,CommandSetCarafe,CommandSetMode,CommandStrength,CommandCups,CommandGrinder,CommandHotplateOn,CommandMode,CommandCarafe,CommandHotplateOff,CommandCoffeeSettings,CommandBrew,CommandCoffeeStop,CommandBrewDefault],"Command status",[]),
+        ResponseCommandStatus   : (True,True,3,[CommandDeviceTime,CommandWifiNetwork,CommandWifiPassword,CommandResetSettings,CommandHeat,CommandKettleStop,CommandHeatFormula,CommandKettleStoreSettings,Command20,CommandHeatDefault,Command22,Command23,CommandBase,CommandCalibrate,CommandWifiStrength,CommandStoreTimer,CommandTimers,CommandDisableTimer,Command30,CommandSetCarafe,CommandSetMode,CommandStrength,CommandCups,CommandGrinder,CommandHotplateOn,CommandMode,CommandCarafe,CommandHotplateOff,CommandCoffeeSettings,CommandBrew,CommandCoffeeStop,CommandBrewDefault],"Command status",[]),
         ResponseWirelessNetworks: (True,True,0,[CommandWifiScan],"Wireless networks list",[]),
         ResponseKettleHistory   : (True,False,0,[CommandKettleHistory],"Kettle history",[]),
         ResponseCoffeeHistory   : (False,True,0,[CommandCoffeeHistory],"Coffee machine history",[]),
@@ -757,7 +757,7 @@ class SmarterProtocol:
     #
 
     GroupWifi           = 1
-    MessagesWifi        = [CommandWifiJoin,CommandWifiLeave,CommandWifiNetwork,CommandWifiPassword,CommandWifiFirmware,CommandWifiScan,ResponseWifiFirmware,ResponseWirelessNetworks]
+    MessagesWifi        = [CommandWifiJoin,CommandWifiLeave,CommandWifiNetwork,CommandWifiPassword,CommandWifiFirmware,CommandWifiScan,ResponseWifiFirmware,ResponseWirelessNetworks,CommandWifiStrength]
     GroupCalibrateOnly  = 39
     MessagesCalibrateOnly  = [CommandStoreBase,CommandCalibrate]
     GroupCalibrate      = 2
@@ -765,7 +765,7 @@ class SmarterProtocol:
     GroupUnknown        = 3
     GroupUnknownKettle  = 26
     MessagesUnknownKettle = [Command20,Command22,Command23,Command30]
-    MessagesUnknown     = MessagesUnknownKettle + [Command69]
+    MessagesUnknown     = MessagesUnknownKettle
     GroupTimers         = 4
     MessagesTimers      = [CommandStoreTimer,CommandTimers,CommandDisableTimer,ResponseTimers]
     GroupHistory        = 5
@@ -841,7 +841,7 @@ class SmarterProtocol:
     GroupKettle         = 24
     GroupRest         = 37
     GroupShared       = 35
-    MessagesShared    = MessagesWifi + MessagesTime + [Command69] + MessagesDeviceInfo + MessagesMaintenance + [ResponseCommandStatus]
+    MessagesShared    = MessagesWifi + MessagesTime + MessagesDeviceInfo + MessagesMaintenance + [ResponseCommandStatus]
 
     MessagesKettle      = MessagesKettleControl + MessagesCalibrate + MessagesShared + MessagesKettleHistory + MessagesUnknownKettle + MessagesKettleStore + MessagesKettleGet
     GroupCoffee         = 25
@@ -1360,6 +1360,21 @@ class SmarterProtocol:
         except Exception, e:
             raise SmarterErrorOld("Temperature is not a number: " + temperature)
 
+
+    #------------------------------------------------------
+    # WIFI ARGUMENT WRAPPER
+    #------------------------------------------------------
+    def string_to_signal(self,signal):
+        try:
+            s = int(signal)
+        except Exception, e:
+            raise SmarterErrorOld("Wireless signal is not a number: " + signal)
+        if s > 130 or s < 0:
+            raise SmarterErrorOld("Wireless signal out of range [0..130]")
+        return s
+      
+    
+    # FIX THIS INTO TWO DIFFERENT EXCEPTION INT & TEMPCHECK
 
     #------------------------------------------------------
     # HOTPLATE KEEPWARM ARGUMENT WRAPPER
@@ -2180,6 +2195,7 @@ class SmarterProtocol:
     ArgTemperatureCombi= 1052
     ArgHotplateCombi   = 1053
     ArgWifiFirmware    = 1055
+    ArgWifiStrength    = 1060
 
     ArgRelayVersion   = 1056
     ArgRelayHost = 1057
@@ -2362,9 +2378,10 @@ class SmarterProtocol:
         CommandRelayPatch           : ('PROTOCOL',[ArgRelayModifiers],"","[mod:]rule(,[mod:]rule)* where rule is a patch"),
 
         CommandUpdate               : ('PROTOCOL',[],"","Disables wifi and creates a 'iKettle Update' wireless network and opens port 6000. A hard appliance reset (hold power button for 10 seconds) is sometimes required to fix this state, or just unplug the power for a moment."),
-        Command69                   : ('PROTOCOL',[ArgUnknown],"00",""),  #REPEAT?
+        
 
     # wifi
+        CommandWifiStrength         : ('PROTOCOL',[ArgWifiStrength],"82","Wifi signal strength in steps of 0.25dBm"),
         CommandWifiNetwork          : ('PROTOCOL',[ArgSSID],"416363657373506f696e74",""),
         CommandWifiPassword         : ('PROTOCOL',[ArgPassword],"7040737377307264",""),
         CommandWifiJoin             : ('PROTOCOL',[],"","Sending this command without previous SSID/password commands will reset it to direct mode. Do not wait between sending the network name, the password and the join command, or else it will fail to join the wireless network. The apps actually sends: 0c7e000000000000."),
@@ -2488,7 +2505,8 @@ class SmarterProtocol:
         ArgRelayModifiers     : ('TEXT',"Block","FIX"),
         ArgTriggerGroups  : ('TEXT',"Groups","Group names sperated with , (comma)"),
         ArgDB             : ('TEXT',"DB","in dBm"),
-        ArgWifiFirmware   : ('TEXT',"WifiFirmware","wifi firmware string"),
+        ArgWifiFirmware   : ('TEXT',"WifiFirmware","Wifi firmware string"),
+        ArgWifiStrength   : ('NUMBER',"WifiStrength",(0,130),"Wifi signal strength"),
         ArgSSID           : ('TEXT',"SSID","wireless network name"),
         ArgGrind          : ('OPTION',"Grind",[(CoffeeFilter,CoffeeStringFilter),(CoffeeBeans,CoffeeStringBeans)]),
        

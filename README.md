@@ -1,4 +1,4 @@
-# iBrew: The Dream Tea!
+# iBrew: Aye!
 
 WARNING: VERSION 3 of the iKettle and VERSION 2 of the Smarter Coffee NOT SUPPORTED
 

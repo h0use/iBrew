@@ -517,6 +517,17 @@ class WifiJoinHandler(GenericAPIHandler):
         self.write(response)
 
 
+class WifiSignalHandler(GenericAPIHandler):
+    def get(self,ip,signal):
+        if ip in self.application.clients:
+            self.application.clients[ip].wifi_signal(signal)
+            response = { 'command'  : Smarter.status_command(client.commandStatus) }    
+        else:
+            response = { 'error': 'no device' }
+        self.setContentType()
+        self.write(response)
+        
+        
 class WifiDirectHandler(GenericAPIHandler):
     def get(self,ip):
         if ip in self.application.clients:
@@ -1449,6 +1460,7 @@ class iBrewWeb(tornado.web.Application):
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/(weak|medium|strong)/?",StrengthHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/(boil|coffee|white|green|black|oelong|milk)/?",BeverageHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/scan/?",WifiScanHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/signal/([0-9]+)/?",WifiSignalHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/join/(.+)/(.*)/?",WifiJoinHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/direct/?",WifiDirectHandler),
                 

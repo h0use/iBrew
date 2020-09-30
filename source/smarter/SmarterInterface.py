@@ -1674,31 +1674,6 @@ class SmarterInterface:
         
         if not os.path.exists(self.settingsPath):
             os.makedirs(self.settingsPath)
-
-        """
-        sqlite_file = 'ibrew.db'     # name of the sqlite database file
-        s = self.host.replace('.','_')
-        print s
-        table_name  =  'statistics' + s + '_' + str(self.port)   # name of the table to be created
-
-        import sqlite3
-        conn = sqlite3.connect(sqlite_file)
-        cur = conn.cursor()
-
-        i = True
-        try:
-            cur.execute("CREATE TABLE " + table_name + "(Id INT, name TEXT, value INT)")
-        except sqlite3.OperationalError:
-            i = False
-
-        if i:
-            cur.execute("INSERT INTO " + table_name + "VALUES(1,'Audi',52642)")
-            cur.execute("INSERT INTO " + table_name + "VALUES(2,'Mercedes',57127)")
-            cur.execute("INSERT INTO " + table_name + "VALUES(3,'Skoda',9000)")
-
-        conn.commit()
-        conn.close()
-        """
         
         config.read(self.settingsPath+'ibrew.conf')
         
@@ -2764,7 +2739,6 @@ class SmarterInterface:
         elif id == Smarter.Command23:                   response = self.__simulate_23()
         elif id == Smarter.Command30:                   response = self.__simulate_30()
         elif id == Smarter.CommandUpdate:               response = self.__simulate_Update()
-        elif id == Smarter.Command69:                   response = self.__simulate_69()
         elif id == Smarter.CommandWifiFirmware:         response = self.__simulate_WifiFirmware()
         elif id == Smarter.CommandWifiNetwork:          response = self.__simulate_WifiNetwork()
         elif id == Smarter.CommandWifiPassword:         response = self.__simulate_WifiPassword()
@@ -3565,9 +3539,7 @@ class SmarterInterface:
 
 
 
-    def __simulate_69(self):
         """
-        Simulate response on command 69
         """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 

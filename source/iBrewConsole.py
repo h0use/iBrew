@@ -1108,8 +1108,14 @@ class iBrewConsole:
             elif command == "firmware":
                                             self.client.wifi_firmware()
                                             if not self.client.dump: self.client.print_wifi_firmware()
-            elif command == "direct":        self.client.wifi_direct()
+            elif command == "direct":       self.client.wifi_direct()
+            elif command == "signal":
+                                            if numarg == 0:
+                                                print "iBrew: specify wireless signal strength [0..130]"
+                                            elif numarg >= 1:
+                                                self.client.wifi_signal(Smarter.string_to_signal(arguments[0]))
             elif command == "scan":
+
                                             self.client.wifi_scan()
                                             if not self.client.dump: self.client.print_wireless_networks()
             elif command == "join":
@@ -1510,6 +1516,7 @@ class iBrewConsole:
         print "  Wireless Network Commands"
         print "    direct                 enable direct mode access"
         print "    join [net] (pass)      connect to wireless network"
+        print "    signal                 set wireless signal strength [0..130]"
         print "    rejoin                 rejoins current wireless network [not in direct mode]"
         print "    scan                   scan wireless networks"
         print

@@ -1516,7 +1516,7 @@ class iBrewConsole:
         print "  Wireless Network Commands"
         print "    direct                 enable direct mode access"
         print "    join [net] (pass)      connect to wireless network"
-        print "    signal                 set wireless signal strength [0..130]"
+        print "    signal                 set wireless signal strength [0..82]"
         print "    rejoin                 rejoins current wireless network [not in direct mode]"
         print "    scan                   scan wireless networks"
         print

@@ -1281,11 +1281,22 @@ class SmarterInterfaceLegacy():
                         o = self.stringboolsGroup(i[0],o)
                     
                     s = s.replace("§O",str(o)).replace("§N",str(n))
-                    
+                    if s[0:8] == "get http":
+                        s = s[4:]
+                        
                     if s[0:4] == "http":
                         try:
                             response = urllib.urlopen(s)
-            
+                        except Exception, e:
+                            print str(e)
+                    elif s[0:9] == "post http":
+                        pos = s.find('?')
+                        base = s[5:pos]
+                        listparams = s[pos+1:].split('&')
+                        params = urllib.urlencode({ i.split('=')[0] : i.split('=')[1] for i in listparams })
+                        try:
+                            response = urllib.urlopen(base, params)
+                            print response.read()
                         except Exception, e:
                             print str(e)
                     else:
@@ -4325,10 +4336,22 @@ class SmarterInterface:
 
                     s = s.replace("§O",str(o)).replace("§N",str(n))
 
+                    if s[0:8] == "get http":
+                        s = s[4:]
+                        
                     if s[0:4] == "http":
                         try:
                             response = urllib.urlopen(s)
-            
+                        except Exception, e:
+                            print str(e)
+                    elif s[0:9] == "post http":
+                        pos = s.find('?')
+                        base = s[5:pos]
+                        listparams = s[pos+1:].split('&')
+                        params = urllib.urlencode({ i.split('=')[0] : i.split('=')[1] for i in listparams })
+                        try:
+                            response = urllib.urlopen(base, params)
+                            print response.read()
                         except Exception, e:
                             print str(e)
                     else:

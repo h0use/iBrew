@@ -1,6 +1,8 @@
 iBrew 20.20 New Vision
 ----------------------
 
+Yes, The last itteration of iBrew.
+
 This version will be a final consolidation of all the feature request & bug fixes from the last couple of years.
 
 Python 2 is end of life (EOF) thus it will complicate and break stuff.
@@ -8,13 +10,15 @@ Therefor all used packages are in the distro folder. Unzip them in the source fo
 
 New features will probably be:
 
-- Packages are now included as backup in the distro folder
-- Wifi Strength
-- (Custom) Firmware uploading
+* Packages are now included as backup in the distro folder
+- Wifi Strength (!!!)
+- (Custom) Firmware uploading (!!!)
 - Smartthings code
-- Triggers can post and get, so added support for homeassistent
-- Docker container
-- Fixes from Idserda, Mongey
+* Triggers can post and get, so added support for homeassistent 
+  - Add to readme
+* Docker container
+* Fixes from Idserda, Mongey
+  - Not implemented Jeroen Idserda event fix (look into that)
 
 
 

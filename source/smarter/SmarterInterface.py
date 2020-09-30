@@ -518,7 +518,7 @@ class SmarterInterfaceLegacy():
     # To iKettle 2.0 from emulate iKettle
 
 
-    # FIX send to ikettle 2
+    #FIX: send to ikettle 2
     def emu_bridge(self,command):
         if self.dump:
             logging.debug("[" + self.host + ":" + str(self.port) + "] executing emulate command: " + SmarterLegacy.command_to_string(command))
@@ -847,7 +847,7 @@ class SmarterInterfaceLegacy():
         for i in self.__clients:
             print self.__clients[i]
             
-            # SHOUL REALLY FIX THE LOCKS ON SENDING!!!
+            #FIX: SHOUL REALLY FIX THE LOCKS ON SENDING!!!
             
             #self.__clients[i].acquire()
             logging.debug("[" + self.host + ":" + str(self.port)  + "] [" + self.relayHost + ":" + str(self.relayPort) + "] [" + i[1][0] + ":" + str(i[1][1]) + "] Legacy response relay [" + status + "] " + SmarterLegacy.string_response(status))
@@ -1428,7 +1428,11 @@ class SmarterInterface:
         self.defaultFormula             = False
         self.defaultFormulaTemperature  = 75
         
-  
+        self.updateBusy                 = False
+        self.updateCRC                  = 0
+        self.updateBlock                = 0
+        self.updateFirmware             = None
+        
         # coffee
         self.waterLevel                 = Smarter.CoffeeWaterFull
 
@@ -1590,9 +1594,9 @@ class SmarterInterface:
         self.simulation                 = False
         self.bridge                     = False
 
-        # firewall or message blocking rules
-        self.rulesIn                 = Smarter.MessagesDebug + Smarter.MessagesRest
-        self.rulesOut                = Smarter.MessagesDebug + Smarter.MessagesRest + Smarter.MessagesWifi + Smarter.MessagesDeviceInfo + Smarter.MessagesCalibrateOnly # use only after setup so speed up ... + Smarter.MessagesGet + Smarter.MessagesModesGet
+        #FIX: firewall or message blocking rules
+        self.rulesIn                 = [] #Smarter.MessagesDebug + Smarter.MessagesRest
+        self.rulesOut                = [] #Smarter.MessagesDebug + Smarter.MessagesRest + Smarter.MessagesWifi + Smarter.MessagesDeviceInfo + Smarter.MessagesCalibrateOnly # use only after setup so speed up ... + Smarter.MessagesGet + Smarter.MessagesModesGet
 
 
         self.patchTemperatureLimitValue = 70
@@ -1683,7 +1687,7 @@ class SmarterInterface:
             pass
 
 
-        ### THESE EXCEPTIONS NEED TO BE CHANGED FIX
+        #FIX: THESE EXCEPTIONS NEED TO BE CHANGED
         try:
             self.totalSendCount = int(config.get(section, 'send')) + self.sendCount - self.__deltaSendCount
             self.__deltaSendCount += self.sendCount - self.__deltaSendCount
@@ -1851,7 +1855,7 @@ class SmarterInterface:
             if  not self.__clients[(clientsock, addr)].locked():
                 self.__clients[(clientsock, addr)].acquire()
                 
-                # BLOCKING HERE FIX
+                #FIX: BLOCKING HERE
                 if self.isKettle:
                     if Smarter.ResponseKettleStatus in self.rulesOut:
                         logging.debug("Blocked relay kettle status")
@@ -2238,7 +2242,7 @@ class SmarterInterface:
     def __send_command(self,id,arguments=""):
         x = Smarter.message_connection(id)
         if len(x) != 0:
-            # that whole fast thing should be fixed.
+            #FIX: that whole fast thing should be fixed.
             if x[0] != Smarter.ResponseCommandStatus:
                 self.fast = False
         else:
@@ -2453,7 +2457,7 @@ class SmarterInterface:
                 if self.__socket:
                     self.__socket.close()
                     self.__socket = None
-            # FIX: Also except thread exceptions..
+            #FIX: Also except thread exceptions..
             except socket.error, msg:
                 self.__socket = None
                 raise SmarterError(SmarterInterfaceFailedStop,"Could not disconnect from " + self.host + " (" + msg[1] + ")")
@@ -2731,6 +2735,8 @@ class SmarterInterface:
         Returns list of reply messages and preform sim action if needed of bot command and response messages.
         """
         
+        #FIX: THERE IS NO DISTINCTION BETWEEN COFFEE AND KETTLE HERE... eg. it will return KettleHistory for
+        #      the coffee machine... I am just to lazy to fix it...
         
         id = Smarter.raw_to_number(message[0])
         if id == Smarter.CommandDeviceInfo:             response = self.__simulate_DeviceInfo()
@@ -2738,8 +2744,11 @@ class SmarterInterface:
         elif id == Smarter.Command22:                   response = self.__simulate_22()
         elif id == Smarter.Command23:                   response = self.__simulate_23()
         elif id == Smarter.Command30:                   response = self.__simulate_30()
-        elif id == Smarter.CommandUpdate:               response = self.__simulate_Update()
-        elif id == Smarter.CommandWifiStrength:         response = self.__simulate_WifiStrength()
+        elif id == Smarter.CommandUpdateInit:           response = self.__simulate_UpdateInit()
+        elif id == Smarter.CommandUpdateBegin:          response = self.__simulate_UpdateBegin()
+        elif id == Smarter.CommandUpdateBlock:          response = self.__simulate_UpdateBlock(message)
+        elif id == Smarter.CommandUpdateEnd:            response = self.__simulate_UpdateEnd(message)
+        elif id == Smarter.CommandWifiSignal:           response = self.__simulate_WifiSignal()
         elif id == Smarter.CommandWifiFirmware:         response = self.__simulate_WifiFirmware()
         elif id == Smarter.CommandWifiNetwork:          response = self.__simulate_WifiNetwork()
         elif id == Smarter.CommandWifiPassword:         response = self.__simulate_WifiPassword()
@@ -3062,9 +3071,9 @@ class SmarterInterface:
 
 
     def __simulate_DeviceTime(self,message):
+        #FIX: not finished...
         """
         Simulate response on command DeviceTime
-        FIX not finished...
         """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
@@ -3223,18 +3232,18 @@ class SmarterInterface:
 
 
     def __simulate_StoreTimer(self,message):
+        #FIX: not finished...
         """
         Simulate response on command StoreTimer
-        FIX
         """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __simulate_Timers(self,message):
+        #FIX: index 0...  type... aaagh....
         """
         Simulate response on command GetTimers
-        FIX index 0...  type... aaagh....
         """
         if message[1] == Smarter.MessageTail:
             return self.__encode_GetTimers(0)
@@ -3244,9 +3253,9 @@ class SmarterInterface:
 
 
     def __simulate_DisableTimer(self,message):
+        #FIX: raw_to_number -> raw_to_index
         """
         Simulate response on command DisableTimer
-        FIX! raw_to_number -> raw_to_index
         """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
@@ -3400,7 +3409,7 @@ class SmarterInterface:
         self.sim_cups = cups
 
         self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
-        # if cup mode no more then 3? FIX
+        #FIX: if cup mode no more then 3?
         return self.__encode_CommandStatus(Smarter.StatusSucces)
     
     
@@ -3510,8 +3519,9 @@ class SmarterInterface:
 
     def __simulate_WifiJoin(self):
         """
-        Simulate response on commandWifiJoin (probably just should disconnect or send nothing FIX)
+        Simulate response on commandWifiJoin
         """
+        #FIX: (probably just should disconnect or send nothing FIX)
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
@@ -3532,8 +3542,7 @@ class SmarterInterface:
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
-
-    def __simulate_Update(self):
+    def __simulate_UpdateInit(self):
         """
         Simulate response on command Update
         """
@@ -3541,7 +3550,31 @@ class SmarterInterface:
 
 
 
-    def __simulate_WifiStrength(self,message):
+    def __simulate_UpdateBegin(self):
+        """
+        Simulate response on command UpdateBegin
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+     
+
+#QQQ
+    def __simulate_UpdateBlock(self,message):
+        """
+        Simulate response on command UpdateBlock
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __simulate_UpdateEnd(self,message):
+        """
+        Simulate response on command UpdateEnd
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __simulate_WifiSignal(self,message):
         """
         Simulate response on command wireless signal strength
         """
@@ -3610,18 +3643,18 @@ class SmarterInterface:
 
 
     def __encode_Timers(self):
+        #FIX: NOT IMPLEMENTED
         """
         Encode Timers response message
-        FIX NOT IMPLEMENTED
         """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_GetTimers(self,index):
+        #FIX: NOT IMPLEMENTED
         """
         Encode Get Timers response message
-        FIX NOT IMPLEMENTED
         """
         return self.__encode_Timers() + self.__encode_CommandStatus(Smarter.StatusSucces)
 
@@ -3760,18 +3793,18 @@ class SmarterInterface:
 
 
     def __encode_KettleHistory(self,history=""):
+        #FIX: Should be a list of history as input...
         """
         Encode no kettle history response message
-        FIX Should be a list of history as input...
         """
         return [Smarter.number_to_raw(Smarter.ResponseKettleHistory) + Smarter.number_to_raw(0) + Smarter.number_to_raw(Smarter.MessageTail)]
  
  
  
     def __encode_CoffeeHistory(self,history=""):
+        #FIX: Should be a list of history as input...
         """
         Encode no coffee history response message
-        FIX Should be a list of history as input...
         """
         return [Smarter.number_to_raw(Smarter.ResponseCoffeeHistory) + Smarter.number_to_raw(0) + Smarter.number_to_raw(Smarter.MessageTail)]
 
@@ -3786,8 +3819,9 @@ class SmarterInterface:
 
 
     def __encode_WifiScan(self,list):
+        #FIX: should take a list of networks
         """
-        Encode wifi access point response message (FIX should take a list of networks))
+        Encode wifi access point response message
         """
         return [Smarter.number_to_raw(Smarter.ResponseWirelessNetworks) + Smarter.text_to_raw(list) + Smarter.number_to_raw(Smarter.MessageTail)]
 
@@ -4380,7 +4414,7 @@ class SmarterInterface:
             elif id == Smarter.ResponseWirelessNetworks:self.__decode_WirelessNetworks(message)
         
         except SmarterError, e:
-            # FIX ERROR HANDLING
+            #FIX: ERROR HANDLING
             logging.debug(str(e))
             logging.debug(traceback.format_exc())
             raise SmarterError(0,"Could not decode message")
@@ -4390,7 +4424,7 @@ class SmarterInterface:
             if self.dump_status:
                 self.print_message_read(message)
             else:
-                #FIX (but what?)
+                #FIX: (but what?)
                 if id != Smarter.ResponseCoffeeStatus and id != Smarter.ResponseKettleStatus:
                     self.print_message_read(message)
                     
@@ -5111,13 +5145,37 @@ class SmarterInterface:
         defaultTemperature = 100
    
  
- 
-    def device_update(self):
+#QQQ
+    def device_update_init(self):
         """
         Enters update mode (do not use)
         """
-        self.__send_command(Smarter.CommandUpdate)
+        self.__send_command(Smarter.CommandUpdateInit)
+   
+   
 
+    def device_update_begin(self,firmware):
+        """
+        Enters update mode begin (do not use)
+        """
+        self.__send_command(Smarter.CommandUpdateBegin)
+
+
+
+    def device_update_block(self,crc,blocknumber,data):
+        """
+        Enters update mode (do not use)
+        """
+        self.__send_command(Smarter.CommandUpdateBlock)
+
+
+
+    def device_update_end(self,crc):
+        """
+        Enters update mode (do not use)
+        """
+        self.__send_command(Smarter.CommandUpdateEnd)
+        # update
 
 
     def device_time_now(self):
@@ -5164,7 +5222,7 @@ class SmarterInterface:
         """
         Set Wifi signal Strength
         """
-        self.__send_command(Smarter.CommandWifiStrength,Smarter.number_to_raw(signal))
+        self.__send_command(Smarter.CommandWifiSignal,Smarter.number_to_raw(signal))
 
 
 
@@ -5694,10 +5752,9 @@ class SmarterInterface:
 
 
     def coffee_timers(self,index=0):
+        #FIX:
         """
         Get timers
-        
-        FIX
         """
         if self.fast or self.isCoffee:
             self.__send_command(Smarter.CommandTimers)
@@ -5707,10 +5764,9 @@ class SmarterInterface:
 
 
     def coffee_timer_disable(self,index=0):
+        #FIX:
         """
         Disable timer or set that we processed the timer
-        
-        FIX
         """
         if self.fast or self.isCoffee:
             pass #self.__send_command(Smarter.CommandDisableTimer)
@@ -5720,10 +5776,9 @@ class SmarterInterface:
 
 
     def coffee_timer_store(self,index=0,time=None):
+        #FIX:
         """
         Store a timer
-        
-        FIX
         """
         if  self.fast or self.isCoffee:
             pass #self.__send_command(Smarter.CommandStoreTimer)
@@ -5974,12 +6029,12 @@ class SmarterInterface:
 
 
     def print_timers(self):
-        # fix this
+        #FIX: NYI
         print "Not yet implemented"
 
 
     def print_coffee_history(self):
-        # fix this THIS IS SO WRONG
+        #FIX: NYI
         if not self.historySuccess:
             print "No history available"
             return
@@ -5994,7 +6049,7 @@ class SmarterInterface:
 
 
     def print_kettle_history(self):
-        # fix this
+        #FIX: NYI
         if not self.historySuccess:
             print "No history available"
             return

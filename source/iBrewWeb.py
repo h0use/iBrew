@@ -432,7 +432,7 @@ class CalibrateHandler(GenericAPIHandler):
             client = self.application.clients[ip]
             if client.isKettle:
                 client.kettle_calibrate()
-                # fix kettle_calibrate_offbase
+                #FIX: kettle_calibrate_offbase
                 response = { 'base'            : client.waterSensorBase,
                              'command'  : Smarter.status_command(client.commandStatus) }
             else:
@@ -1204,7 +1204,7 @@ class LegacyHandler(GenericAPIHandler):
                     if command != "":
                         client.iKettle.send(command)
                     response = encodeLegacy(client.iKettle)
-                # FIX for right exception
+                #FIX: for right exception
                 except Exception, e:
                     response = { 'error' : 'failed to send command' }
             else:
@@ -1224,7 +1224,7 @@ class LegacyRawHandler(GenericAPIHandler):
             if client.isKettle:
                 try:
                     response = str(client.iKettle.eventStringRaw(command))
-                # FIX for right exception
+                #FIX: for right exception
                 except Exception, e:
                     print str(e)
                 # raise 404
@@ -1238,7 +1238,7 @@ class RawHandler(GenericAPIHandler):
             client = self.application.clients[ip]
             try:
                 response = str(client.eventStringRaw(command))
-            # FIX for right exception
+            #FIX: for right exception
             except Exception, e:
                 print str(e)
                 # raise 404

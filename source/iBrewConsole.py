@@ -145,7 +145,7 @@ class iBrewConsole:
             return
         print "iBrew: Press ctrl-c to stop"
  
-
+        #FIX: Should dump firewall rules and restore them after
         for id in range(int(start),256):
             try:
                 # known command/message?
@@ -163,7 +163,7 @@ class iBrewConsole:
                     # button pressed quit...
                     self.client.device_raw(Smarter.number_to_code(id))
 
-                    # check if got also a ???status message... FIX
+                    #FIX: check if got also a ???status message...
                     if self.client.commandStatus != Smarter.StatusInvalid:
                         print "iBrew: New command found: " + Smarter.number_to_code(id)
                     self.client.dump = False
@@ -1181,7 +1181,7 @@ class iBrewConsole:
                                             except:
                                             # Exception, e:
                                                 print "iBrew: Beans already selected"
-                                                # Fix could be no coffee machine...x
+                                                #FIX: could be no coffee machine...x
             elif command == "filter" or command == "pregrind":
                                             try:
                                                 self.client.coffee_filter()
@@ -1189,7 +1189,7 @@ class iBrewConsole:
                                             except:
                                             # Exception, e:
                                                 print "iBrew: Filter already selected"
-                                                # Fix could be no coffee machine...x
+                                                #FIX: could be no coffee machine...x
             
             elif command == "descale":
                                             try:
@@ -1231,7 +1231,7 @@ class iBrewConsole:
                                                  self.sweep(Smarter.code_to_number(arguments[0]))
                                             else:
                                                 self.sweep()
-            elif command == "settings":     # FAST fix need device... could default...
+            elif command == "settings":     #FIX: FAST fix need device... could default...
                                             if numarg == 0:
                                                 self.client.device_settings()
                                                 if not self.client.dump: self.client.print_settings()
@@ -1505,7 +1505,7 @@ class iBrewConsole:
         print "    filter                 use pregrind beans in filter for coffee"
         print "    hotplate off           turn hotplate off"
         
-        # VERAMDER DEZE FIX (ON MAG WEG)
+        #FIX: Change (On gotta go...)
         print "    hotplate on (minutes)  turn hotplate on (time in minutes)"
         print "    mode                   return which mode: cup or carafe mode"
         print "    mode [mode]            set mode: [cup] or [carafe] mode"

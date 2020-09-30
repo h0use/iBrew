@@ -11,14 +11,14 @@ Therefor all used packages are in the distro folder. Unzip them in the source fo
 New features will probably be:
 
 * Packages are now included as backup in the distro folder
-- Wifi Strength (!!!)
-- (Custom) Firmware uploading (!!!)
-- Smartthings code
+* Wifi Strength (!!!)
 * Triggers can post and get, so added support for homeassistent 
   - Add to readme
 * Docker container
 * Fixes from Idserda, Mongey
   - Not implemented Jeroen Idserda event fix (look into that)
+- (Custom) Firmware uploading (!!!)
+- Smartthings code
 
 
 

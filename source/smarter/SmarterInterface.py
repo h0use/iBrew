@@ -2739,6 +2739,7 @@ class SmarterInterface:
         elif id == Smarter.Command23:                   response = self.__simulate_23()
         elif id == Smarter.Command30:                   response = self.__simulate_30()
         elif id == Smarter.CommandUpdate:               response = self.__simulate_Update()
+        elif id == Smarter.CommandWifiStrength:         response = self.__simulate_WifiStrength()
         elif id == Smarter.CommandWifiFirmware:         response = self.__simulate_WifiFirmware()
         elif id == Smarter.CommandWifiNetwork:          response = self.__simulate_WifiNetwork()
         elif id == Smarter.CommandWifiPassword:         response = self.__simulate_WifiPassword()
@@ -2858,6 +2859,7 @@ class SmarterInterface:
         self.sim_working                = False
         
         self.sim_WifiFirmware           = "6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"
+        
 
         # internal data kettle variable
         self.sim_setTemperature         = 100
@@ -3539,7 +3541,9 @@ class SmarterInterface:
 
 
 
+    def __simulate_WifiStrength(self):
         """
+        Simulate response on command wireless signal strength
         """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
@@ -5148,6 +5152,14 @@ class SmarterInterface:
         Scan for Wireless networks
         """
         self.__send_command(Smarter.CommandWifiScan)
+
+
+
+    def wifi_signal(self,signal=82):
+        """
+        Set Wifi signal Strength
+        """
+        self.__send_command(Smarter.CommandWifiStrength,Smarter.number_to_raw(signal))
 
 
 

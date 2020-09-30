@@ -520,8 +520,8 @@ class WifiJoinHandler(GenericAPIHandler):
 class WifiSignalHandler(GenericAPIHandler):
     def get(self,ip,signal):
         if ip in self.application.clients:
-            self.application.clients[ip].wifi_signal(signal)
-            response = { 'command'  : Smarter.status_command(client.commandStatus) }    
+            self.application.clients[ip].wifi_signal(Smarter.string_to_signal(signal))
+            response = { 'command'  : Smarter.status_command(self.application.clients[ip].commandStatus) }    
         else:
             response = { 'error': 'no device' }
         self.setContentType()
@@ -1006,7 +1006,7 @@ class VersionHandler(GenericAPIHandler):
     def get(self):
         response = { 'description': 'iBrew REST API',
                      'version'    : self.application.version,
-                     'copyright'  : { 'year'   : '2017',
+                     'copyright'  : { 'year'   : '2020',
                                       'holder' : 'Tristan Crispijn'
                                     }
                     }
@@ -1251,7 +1251,7 @@ class RawHandler(GenericAPIHandler):
 
 class iBrewWeb(tornado.web.Application):
 
-    version = '0.90a'
+    version = '0.91a'
     
     def start(self):
         tornado.ioloop.IOLoop.instance().start()

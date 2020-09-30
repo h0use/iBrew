@@ -1111,7 +1111,7 @@ class iBrewConsole:
             elif command == "direct":       self.client.wifi_direct()
             elif command == "signal":
                                             if numarg == 0:
-                                                print "iBrew: specify wireless signal strength [0..130]"
+                                                print "iBrew: specify wireless signal strength [0..82]"
                                             elif numarg >= 1:
                                                 self.client.wifi_signal(Smarter.string_to_signal(arguments[0]))
             elif command == "scan":

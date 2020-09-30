@@ -1369,8 +1369,8 @@ class SmarterProtocol:
             s = int(signal)
         except Exception, e:
             raise SmarterErrorOld("Wireless signal is not a number: " + signal)
-        if s > 130 or s < 0:
-            raise SmarterErrorOld("Wireless signal out of range [0..130]")
+        if s > 82 or s < 0:
+            raise SmarterErrorOld("Wireless signal out of range [0..82]")
         return s
       
     
@@ -2506,7 +2506,7 @@ class SmarterProtocol:
         ArgTriggerGroups  : ('TEXT',"Groups","Group names sperated with , (comma)"),
         ArgDB             : ('TEXT',"DB","in dBm"),
         ArgWifiFirmware   : ('TEXT',"WifiFirmware","Wifi firmware string"),
-        ArgWifiStrength   : ('NUMBER',"WifiStrength",(0,130),"Wifi signal strength"),
+        ArgWifiStrength   : ('NUMBER',"WifiStrength",(0,82),"Wifi signal strength"),
         ArgSSID           : ('TEXT',"SSID","wireless network name"),
         ArgGrind          : ('OPTION',"Grind",[(CoffeeFilter,CoffeeStringFilter),(CoffeeBeans,CoffeeStringBeans)]),
        

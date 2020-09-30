@@ -3546,7 +3546,7 @@ class SmarterInterface:
         Simulate response on command wireless signal strength
         """
         try:
-            Smarter(Smarter.raw_to_signal(message[1])
+            Smarter(Smarter.raw_to_signal(message[1]))
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
         return self.__encode_CommandStatus(Smarter.StatusSucces)

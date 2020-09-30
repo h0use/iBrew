@@ -35,12 +35,5 @@
 
 *.exe
 
-/source/pybonjour/
-
-/source/tornado/
-
-/source/wireless/
-
-/source/rumps/
 
 

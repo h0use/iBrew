@@ -4930,6 +4930,7 @@ class SmarterInterface:
                 self.hotPlate = self.defaultHotPlate
                 self.coffee_mode()
                 self.coffee_carafe_required()
+            self.wifi_signal(82)
             #self.wifi_firmware()
             self.relay_info()
             self.__triggerHeartBeats()

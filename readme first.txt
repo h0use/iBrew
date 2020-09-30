@@ -16,25 +16,18 @@ New features will probably be:
   - Add to readme
 * Docker container
 * Fixes from Idserda, Mongey
-  - Not implemented Jeroen Idserda event fix (look into that)
 - (Custom) Firmware uploading (!!!)
 - Smartthings code
 
 
 
-Fixes from github:
-
-Jeroen Idserda
+Fixes from github. Thanks to: Jeroen Idserda, Conor Mongey & Gesv
 - Only switch to beans if machine is in filter mode
 - Bump firmware to final version
 - Make sure ‘enough water’ value uses correct switch type
-
-Conor Mongey
 - Source python version from the environment
 - Exceptions should be error level
 - None, not null
 - Docker file
-
-Gesv
 - Fix Web Server BrewHandler
 

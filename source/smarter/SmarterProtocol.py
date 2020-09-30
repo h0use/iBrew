@@ -1374,7 +1374,7 @@ class SmarterProtocol:
 
 
     # added new firmware v22 which has a hotplate range till 40...
-    def check_hotplate(self,timer,version=20):
+    def check_hotplate(self,timer,version=22):
         if version < 22 and timer != 0 and (timer < 5 or timer > 35):
             raise SmarterErrorOld("Hotplate timer out of range [0=Off] or [5..35] minutes: " + str(timer))
         if version >= 22 and timer != 0 and (timer < 5 or timer > 40):
@@ -1385,11 +1385,11 @@ class SmarterProtocol:
         if timer > 0: return True
         else: return False
 
-    def raw_to_hotplate(self,raw,version=20):
+    def raw_to_hotplate(self,raw,version=22):
         return self.check_hotplate(self.raw_to_number(raw),version)
 
 
-    def hotplate_to_raw(self,timer,version=20):
+    def hotplate_to_raw(self,timer,version=22):
         return self.number_to_raw(self.check_hotplate(timer,version))
 
 
@@ -1903,14 +1903,14 @@ class SmarterProtocol:
         rc = pid.returncode
 
         if rc != 0:
-            return null
+            return None
 
         pid = subprocess.Popen(["arp", "-n", target], shell=False, stdout=subprocess.PIPE)
         s = pid.communicate()[0]
         result = re.search(r"(([a-f\d]{1,2}\:){5}[a-f\d]{1,2})", s) 
         mac = result.group(0)
 
-        return result.group(0) if result else null
+        return result.group(0) if result else None
 
     def print_devices_found(self,devices,relay):
         for i in range(0,len(devices)):

@@ -4619,7 +4619,7 @@ class SmarterInterface:
             self.waterLevel = v
             change = True
 
-        v = Smarter.raw_to_waterlevel_bit(message[2])
+        v = bool(Smarter.raw_to_waterlevel_bit(message[2]))
         if v != self.waterEnough:
             self.__trigger(Smarter.triggerWaterEnough,self.waterEnough,v)
             self.waterEnough = v
@@ -5857,13 +5857,12 @@ class SmarterInterface:
         This also changes using beans instead of the filter
         Or using the grinder instead of pregrind
         """
-        try:
+        if not self.grind:
             self.coffee_beans()
-            self.coffee_strength(Smarter.CoffeeWeak)
-        except:
-            raise SmarterError(0,"Could not set to weak")
+        self.coffee_strength(Smarter.CoffeeWeak)
             
-
+            
+            
     def coffee_medium(self):
         """
         Set the coffee strength to weak
@@ -5871,7 +5870,8 @@ class SmarterInterface:
         This also changes using beans instead of the filter
         Or using the grinder instead of pregrind
         """
-        self.coffee_beans()
+        if not self.grind:
+            self.coffee_beans()
         self.coffee_strength(Smarter.CoffeeMedium)
 
 
@@ -5883,7 +5883,8 @@ class SmarterInterface:
         This also changes using beans instead of the filter
         Or using the grinder instead of pregrind
         """
-        self.coffee_beans()
+        if not self.grind:
+            self.coffee_beans()
         self.coffee_strength(Smarter.CoffeeStrong)
 
 

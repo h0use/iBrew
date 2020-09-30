@@ -14,9 +14,9 @@ import webbrowser
 #
 # https://github.com/Tristan79/iBrew
 #
-# Copyright © 2017 Tristan (@monkeycat.nl). All Rights Reserved
+# Copyright © 2020 Tristan. All Rights Reserved
 #
-# The Dream Tea
+# Aye!
 #------------------------------------------------------
 
 rumps.debug_mode(False)  # turn on command line logging information for development - default is off

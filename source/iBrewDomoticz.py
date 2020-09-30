@@ -21,9 +21,9 @@ from smarter.SmarterProtocol import *
 #
 # https://github.com/Tristan79/iBrew
 #
-# Copyright © 2017 Tristan (@monkeycat.nl). All Rights Reserved
+# Copyright © 2020 Tristan. All Rights Reserved
 #
-# The Dream Tea
+# Aye!
 #------------------------------------------------------
 
 url_hardware_add = 'http://%s/json.htm?type=command&param=addhardware&htype=15&port=1&name=%s&enabled=true'

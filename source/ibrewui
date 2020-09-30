@@ -21,9 +21,9 @@ from iBrewWeb import *
 #
 # https://github.com/Tristan79/iBrew
 #
-# Copyright © 2016 Tristan (@monkeycat.nl)
+# Copyright © 2020 Tristan. All Rights Reserved
 #
-# The Dream Tea
+# Aye!
 #------------------------------------------------------
 
 class Launcher():    

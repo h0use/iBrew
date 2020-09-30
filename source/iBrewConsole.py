@@ -31,9 +31,9 @@ import traceback
 #
 # https://github.com/Tristan79/iBrew
 #
-# Copyright © 2017 Tristan (@monkeycat.nl). All Rights Reserved
+# Copyright © 2020 Tristan. All Rights Reserved
 #
-# The Dream Tea
+# Aye!
 #------------------------------------------------------
 
 
@@ -44,7 +44,7 @@ import traceback
 
 
 iBrewApp          = "iBrew - Smarter Appliances Interface"
-iBrewInfo         = "The Dream Tea © 2017 Tristan Crispijn (tristan@monkeycat.nl). All Rights Reserved"
+iBrewInfo         = "2020 - Aye! © 2020 Tristan Crispijn (tristan@monkeycat.nl). All Rights Reserved"
 iBrewContribute   = "Please DONATE! Food, jokes, hugs and fun toys! To your favaroite cat!\n\nContribute any discoveries on https://github.com/Tristan79/iBrew/issues"
 
 class iBrewConsole:

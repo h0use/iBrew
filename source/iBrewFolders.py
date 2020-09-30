@@ -10,9 +10,9 @@ import platform
 #
 # https://github.com/Tristan79/iBrew
 #
-# Copyright © 2017 Tristan (@monkeycat.nl). All Rights Reserved
+# Copyright © 2020 Tristan. All Rights Reserved
 #
-# The Dream Tea
+# Aye!
 #------------------------------------------------------
 
 appname = 'iBrew'

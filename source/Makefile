@@ -1,5 +1,9 @@
 all:
 	@echo "iBrew setup (Windows, Linux & macOS)"
+        @echo "note: due to python 3 and time past, this make file is probably broken"
+        @echo "      thus the needed packages are also in the distro/packages folder"
+        @echo "      just unzip them into the source folder"
+        @echo "      stupid python 3 breaks everything, and you do not need python 2... pfff :-)"
 	@echo use \"make setup\" "to install requirements (source only no bonjour)"
 	@echo use \"make cleanlin\" to clean temp files
 	@echo use \"make cleanmac\" to clean temp files

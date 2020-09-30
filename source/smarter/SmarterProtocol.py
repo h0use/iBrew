@@ -1372,6 +1372,9 @@ class SmarterProtocol:
         if s > 82 or s < 0:
             raise SmarterErrorOld("Wireless signal out of range [0..82]")
         return s
+        
+    def raw_to_signal(self,raw):
+        return string_to_signal(raw_to_number(signal))
       
     
     # FIX THIS INTO TWO DIFFERENT EXCEPTION INT & TEMPCHECK

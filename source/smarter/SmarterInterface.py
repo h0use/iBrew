@@ -3541,10 +3541,14 @@ class SmarterInterface:
 
 
 
-    def __simulate_WifiStrength(self):
+    def __simulate_WifiStrength(self,message):
         """
         Simulate response on command wireless signal strength
         """
+        try:
+            Smarter(Smarter.raw_to_signal(message[1])
+        except SmarterError:
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 

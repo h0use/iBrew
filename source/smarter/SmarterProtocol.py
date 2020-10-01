@@ -1395,7 +1395,7 @@ class SmarterProtocol:
         return s
         
     def raw_to_signal(self,raw):
-        return string_to_signal(raw_to_number(signal))
+        return self.string_to_signal(self.raw_to_number(raw))
       
     
     #FIX: THIS INTO TWO DIFFERENT EXCEPTION INT & TEMPCHECK

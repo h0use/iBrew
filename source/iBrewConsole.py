@@ -890,9 +890,21 @@ class iBrewConsole:
                                                 self.client.print_patches()
                                             else:
                                                 self.client.print_patches_short()
-            elif command == "unblock":      self.client.unblock(arguments[0])
-            elif command == "block":        self.client.block(arguments[0])
-            elif command == "patch":        self.client.patch(arguments[0])
+            elif command == "unblock":
+                                            if numarg > 0:
+                                                self.client.unblock(arguments[0])
+                                            else:
+                                                print "iBrew: Missing Rules"
+            elif command == "block":
+                                            if numarg > 0:
+                                                self.client.block(arguments[0])
+                                            else:
+                                                print "iBrew: Missing Rules"
+            elif command == "patch":
+                                            if numarg > 0:
+                                                self.client.patch(arguments[0])
+                                            else:
+                                                print "iBrew: Missing Patch"
             elif command == "remote":
                                             if numarg == 1 and arguments[0] == "info":
                                                 self.client.relay_info()

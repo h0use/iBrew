@@ -1595,7 +1595,8 @@ class SmarterInterface:
         self.bridge                     = False
 
         #FIX: firewall or message blocking rules
-        self.rulesIn                 = [] #Smarter.MessagesDebug + Smarter.MessagesRest
+        #UPD: for now block the update messages and simulate them...
+        self.rulesIn                 = Smarter.MessagesUpdate #Smarter.MessagesDebug + Smarter.MessagesRest
         self.rulesOut                = [] #Smarter.MessagesDebug + Smarter.MessagesRest + Smarter.MessagesWifi + Smarter.MessagesDeviceInfo + Smarter.MessagesCalibrateOnly # use only after setup so speed up ... + Smarter.MessagesGet + Smarter.MessagesModesGet
 
 
@@ -2066,6 +2067,7 @@ class SmarterInterface:
                         if monitorCount % timeout == timeout - 39:
                             self.__write_stats()
                         
+                        #FIX: disable timer & history
                         if monitorCount % timeout == timeout - 49:
                             pass #self.coffee_timers()
                             self.relay_info()
@@ -3557,7 +3559,7 @@ class SmarterInterface:
         return self.__encode_CommandStatus(Smarter.StatusSucces)
      
 
-#QQQ
+#UPD:
     def __simulate_UpdateBlock(self,message):
         """
         Simulate response on command UpdateBlock
@@ -5145,7 +5147,7 @@ class SmarterInterface:
         defaultTemperature = 100
    
  
-#QQQ
+#UPD:
     def device_update_init(self):
         """
         Enters update mode (do not use)

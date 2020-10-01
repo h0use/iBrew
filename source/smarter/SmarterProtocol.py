@@ -461,6 +461,7 @@ class SmarterProtocol:
     CommandResetSettings      = 0x10
     CommandDeviceInfo         = 0x64
     
+    #UPD: OK
     # firmware update
     CommandUpdateInit         = 0x6d
     CommandUpdateBegin        = 0x6e
@@ -600,7 +601,7 @@ class SmarterProtocol:
         CommandWifiSignal       : (True,True,[ResponseCommandStatus],"Set wifi signal strength"),
         CommandWifiFirmware     : (True,True,[ResponseWifiFirmware],"Get wifi firmware info"),
         
-#QQQ
+#UPD: unknown which response
         CommandUpdateInit       : (True,True,[ResponseCommandStatus],"Appliance firmware update init"),
         CommandUpdateBegin      : (True,True,[ResponseCommandStatus],"Appliance firmware update begin"),
         CommandUpdateBlock      : (True,True,[ResponseCommandStatus],"Appliance firmware update block"),
@@ -811,7 +812,7 @@ class SmarterProtocol:
     __MessagesKettle    = [CommandHeat,CommandHeatFormula,CommandHeatDefault,CommandKettleStop]
     MessagesKettleControl      = __MessagesKettle + [ResponseKettleStatus]
     GroupMaintenance    = 11
-#QQQ
+#UPD: OK
     GroupUpdate         = 42
     MessagesUpdate      = [CommandUpdateInit,CommandUpdateBegin,CommandUpdateBlock,CommandUpdateEnd]
     MessagesMaintenance = MessagesUpdate + [CommandResetSettings]
@@ -898,8 +899,6 @@ class SmarterProtocol:
         GroupControl     : ("Controls",MessagesControl),
         GroupUnknownKettle : ("UnknownKettle",MessagesUnknownKettle),
         GroupMaintenance : ("Maintenance",MessagesMaintenance),
-        
-#QQQ
         GroupUpdate      : ("Update",MessagesUpdate),
 
         # Kinda duplicate... of the other protocol table with commands... (o well :)
@@ -1183,7 +1182,7 @@ class SmarterProtocol:
 
     KettleFirmwareVerified    = [19]
     CoffeeFirmwareVerified    = [20,22]
-#QQQ
+#UPD: OK
     WifiStringKettleUpdate    = DeviceStringKettle + " Update"
     WifiStringCoffeeUpdate    = DeviceStringCoffee + " Update"
     WifiStringKettleDirect    = DeviceStringKettle + ":c0"
@@ -2223,7 +2222,10 @@ class SmarterProtocol:
     ArgNumber8BitC     = 1063
     ArgNumber8BitD     = 1064
     ArgUpdateCRC       = 1065
-
+    ArgBlockNumber     = 1066
+    ArgSizeData        = 1067
+    ArgUpdateSeperatorEnd   = 1068
+    ArgUpdateSeperatorBegin = 1069
 
     ArgRelayVersion   = 1056
     ArgRelayHost = 1057
@@ -2236,6 +2238,8 @@ class SmarterProtocol:
     ArgPayloadWifiScan         = 1039
     ArgWater  = 1033
     
+    
+    #FIX: DID NOT ADD THESE TO THE NEW MESSAGE THINGY...
     # NOT ADDED
     ArgSubList        = 1030
     ArgList           = 1031
@@ -2243,13 +2247,11 @@ class SmarterProtocol:
     
     # ArgIndex needs combines with 0 index...???
     
-    """
-            print "  YEAR80"
-            print "    00..FF  YEAR = YEAR80 + 1980"
+    def MessagesOld(self,id):
+        if id == Smarter.ResponseWirelessNetworks:
+            print "  Extra info on: " + Smarter.message_description(id)
+            print "  ─────────────────────────────────────────────────────────────────────────"
             print
-       
-
-        elif id == Smarter.ResponseWirelessNetworks:
             print "  DB is the signal strength in dBm format."
             print
             print "  Response: <PAYLOAD>"
@@ -2265,12 +2267,13 @@ class SmarterProtocol:
             
             
         elif id == Smarter.CommandHeat:
+            print "  Extra info on: " + Smarter.message_description(id)
+            print "  ─────────────────────────────────────────────────────────────────────────"
+            print
             print "  If no arguments are given it uses its default."
             print
             print "  Arguments: <[<TEMPERATURE><[KEEKWARMTIME]>]>"
             print
-            Temperature()
-            Keepwarm()
             print "  Examples: 21 50 05 7e"
             print "            21 44 7e"
             print "            21 7e"
@@ -2279,6 +2282,9 @@ class SmarterProtocol:
 
         
         elif id == Smarter.ResponseCoffeeHistory:
+            print "  Extra info on: " + Smarter.message_description(id)
+            print "  ─────────────────────────────────────────────────────────────────────────"
+            print
             print "  The payload is generated everytime the coffee machine brews. The actioncounter increases with every brewing?"
             print
             print "  Payload maximum is 8. So if 8 check again, if there is more history"
@@ -2293,12 +2299,13 @@ class SmarterProtocol:
             print "    <??><??><??><DEFAULT/CUPS?><DEFAULT/CUPS?><SECONDS??>"
             print "    <HOURS???><MINUTES???><DAY??><MONTH><YEAR80???><STATE><??>{19}"
             print
-            Cups()
-            History()
             print "  Example: 47 02 01 00 00 02 02 00 19 00 01 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7d"
             print "                 01 00 00 0c 0c 00 19 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7d 7e"
            
         elif id == Smarter.ResponseKettleHistory:
+            print "  Extra info on: " + Smarter.message_description(id)
+            print "  ─────────────────────────────────────────────────────────────────────────"
+            print
             print "  The payload is generated everytime the kettle stops heating. The actioncounter increases with every heating?"
             print "  Formula temperature is above 0 then it was heated with formula temperature enabled. There seems to be some"
             print "  packed time available."
@@ -2315,40 +2322,15 @@ class SmarterProtocol:
             print "  COUNTER"
             print "    00..08"
             print
-            Temperature()
-            Keepwarm()
-            Formula()
             print "  ACTIONCOUNTER"
             print "    00..ff  Amount of heatings before off base"
-            History()
             print "  Example: 29 02 01 5f 00 00 0f 00 09 03 15 0a 19 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7d"
             print "                 01 64 19 32 10 00 09 0e 15 0a 19 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7d 7e"
-        
-        elif id == Smarter.CommandStoreBase:
-            print "  This can contain the tail 7e, so check for length here!"
-            print
-            print "  Arguments: <BASELHIGHBITS><BASELOWBITS>"
-            print
-            print "  BASE = BASELHIGHBITS * 256 + BASELOWBITS [0..4095]"
-            print
-            print "  Example: 2a 04 03"
-
-
-        elif id == Smarter.ResponseBase:
-            print "  This can contain the tail 7e, so check for length here!"
-            print
-            print "  Response: <BASELHIGHBITS><BASELOWBITS>"
-            print
-            print "  BASE = BASELHIGHBITS * 256 + BASELOWBITS [0..4095]"
-
-        elif id == Smarter.Command30:
-            print "  Arguments: <[UNKNOWN]>{?}"
-            print
-            print "  Example: 30 7e"
-    
-  
-
+            
         elif id == Smarter.ResponseTimers:
+            print "  Extra info on: " + Smarter.message_description(id)
+            print "  ─────────────────────────────────────────────────────────────────────────"
+            print
             print "  Arguments: <PAYLOAD>{1 or 4}"
             print
             print "  PAYLOAD  <UNKNOWN><MINUTES><HOURS><??><DAY><MONTH><CENTURY><YEAR>"
@@ -2357,9 +2339,7 @@ class SmarterProtocol:
             print "    00 Happended"
             print "    01 Not happened"
             print
-            Timers()
-    """
-
+        print
     
     
     ArgType = {
@@ -2367,7 +2347,7 @@ class SmarterProtocol:
         ResponseKettleHistory       : ('PROTOCOL',[ArgPayloadKettleHistory],"020164000006001927250c1901000000000000000000000000000000000000007d\n015f000001001902260c1901000000000000000000000000000000000000007d",""),
         ResponseTimers              : ('PROTOCOL',[ArgCounter,ArgPayloadTimer],"000f0f01010114147d01030701010114137d01020501010114127d01010101010114117d",""),
         ResponseCoffeeHistory       : ('PROTOCOL',[ArgCounter,ArgPayloadCoffeeHistory],"03010000020200000b01010000000000000000000000000000000000000000007d\n010000020200012001010000000000000000000000000000000000000000007d\n010010010101000401010014000000000000000000000000000000000000007d",""),
-        ResponseBase                : ('PROTOCOL',[ArgWater],"044c","Calibration base value, the base value in relation to the watersensor and temperature is unknown"),
+        ResponseBase                : ('PROTOCOL',[ArgWater],"044c","Calibration base value, the base value in relation to the watersensor and temperature is unknown, can contain 7e so check for size"),
 
         ArgPayloadTimer             : ('PAYLOAD',"PAYLOADTIMER",MessagePayloadTail,[]),
         ArgPayloadCoffeeHistory     : ('PAYLOAD',"PAYLOADHISTORYKETTLE",MessagePayloadTail,[]),
@@ -2379,14 +2359,14 @@ class SmarterProtocol:
 
         ResponseTriggerGroups          : ('PROTOCOL',[ArgTriggerGroups],"",""),
 
-        ResponseRelayInfo          : ('PROTOCOL',[ArgRelayVersion,ArgRelayHost],"0131302e302e302e3939","Get the version of the firmware of relay connected to (if connected) It is used for auto discovery over UDP broadcast by iBrew. This fails on some routers, which don't propagate UDP broadcasts."),
+        ResponseRelayInfo          : ('PROTOCOL',[ArgRelayVersion,ArgRelayHost],"0131302e302e302e3939","Get the version of the firmware of relay connected to (if connected) It is used for auto discovery over UDP broadcast by iBrew. \n This fails on some routers, which don't propagate UDP broadcasts (disable igmp snooping on your switches and routers)."),
 
         ResponseRelayModifiersInfo          : ('PROTOCOL',[ArgRelayModifiers],"","[in:|out:|mod]rule(,[in:|out:|mod:]rule)* where rule: message id, group name or in: and out: and rule is a patch for mod:"),
 
         ResponseCarafe              : ('PROTOCOL',[ArgCarafe],"00",""),
         ResponseMode       : ('PROTOCOL',[ArgMode],"01",""),
         ResponseCommandStatus       : ('PROTOCOL',[ArgCommandStatus],"04",""),
-        ResponseDeviceInfo          : ('PROTOCOL',[ArgDevice,ArgVersion],"0113","Get the type of the appliance connected to and it's firmware. It is used for auto discovery over UDP broadcast. This fails on some routers, which don't propagate UDP broadcasts."),
+        ResponseDeviceInfo          : ('PROTOCOL',[ArgDevice,ArgVersion],"0113","Get the type of the appliance connected to and it's firmware. It is used for auto discovery over UDP broadcast.\n  This fails on some routers, which don't propagate UDP broadcasts (disable igmp snooping on your switches and routers)."),
         ResponseWifiFirmware        : ('PROTOCOL',[ArgWifiFirmware],"41542b474d525c6e41542076657273696f6e3a302e34302e302e302841756720203820323031352031343a34353a3538295c6e53444b2076657273696f6e3a312e332e305c6e636f6d70696c652074696d653a41756720203820323031352031373a31393a33385c6e4f4b5c6e",""),
         ResponseCoffeeSettings      : ('PROTOCOL',[ArgStrength,ArgCups,ArgGrind,ArgHotPlate],"01020005",""),
         ResponseCoffeeStatus        : ('PROTOCOL',[ArgCoffeeStatus,ArgWaterLevelRaw,ArgUnknown,ArgStrength,ArgCupsCombi],"0500000021",""),
@@ -2406,16 +2386,22 @@ class SmarterProtocol:
 
 
     # update
-    #QQQ
+    #UPD: fill in rest of protocol only have to describe data
         ArgNumber8BitD              : ('NUMBER',"Fourth 8 bits",(0,255),""),
         ArgNumber8BitC              : ('NUMBER',"Third 8 bits",(0,255),""),
         ArgNumber8BitB              : ('NUMBER',"Second 8 bits",(0,255),""),
         ArgNumber8BitA              : ('NUMBER',"First 8 bits",(0,255),""),
-        ArgUpdateCRC                : ('INT',"CRC",ArgNumber8BitD,ArgNumber8BitC,ArgNumber8BitB,ArgNumber8BitA),
+        ArgNumber8BitA              : ('NUMBER',"First 8 bits",(0,255),""),
+        ArgUpdateSeperatorBegin     : ('SEP',"UpdateSeperator Begin","7D",""),
+        ArgUpdateSeperatorEnd       : ('SEP',"UpdateSeperator End","7E7E",""),
+        ArgSizeData                 : ('INT',"Size",ArgNumber8BitB,ArgNumber8BitA,""),
+        ArgBlockNumber              : ('NUMBER',"Block Number",(0,255),""),
+        
+        ArgUpdateCRC                : ('BIGINT',"CRC",ArgNumber8BitD,ArgNumber8BitC,ArgNumber8BitB,ArgNumber8BitA),
 
         CommandUpdateBegin          : ('PROTOCOL',[],"","Start Upload Firmware"),
-        CommandUpdateBlock          : ('PROTOCOL',[],"","Block Upload Firmware"),
-        CommandUpdateEnd            : ('PROTOCOL',[ArgUpdateCRC],"","End Upload Firmware"),
+        CommandUpdateBlock          : ('PROTOCOL',[ArgBlockNumber,ArgSizeData,ArgUpdateSeperatorBegin,ArgUpdateSeperatorEnd],"","Data Block Upload Firmware"),
+        CommandUpdateEnd            : ('PROTOCOL',[ArgUpdateCRC],"3f23","End Upload Firmware"),
         CommandUpdateInit           : ('PROTOCOL',[],"","Disables wifi and creates a 'iKettle Update' wireless network and opens port 6000. A hard appliance reset (hold power button for 10 seconds) is sometimes required to fix this state, or just unplug the power for a moment."),
    
 
@@ -2503,16 +2489,17 @@ class SmarterProtocol:
         ArgYear              : ('NUMBER',"Year",(0,99),""),
         ArgCentury           : ('NUMBER',"Century",(19,21),""),
         ArgUnknown           : ('NUMBER',"Unknown",(0,255),"Unknown number"),
-        ArgVersion           : ('OPTION',"Version",[(18,"iKettle 2.0"),
-                                    (20,DeviceStringCoffee),
-                                    (22,DeviceStringCoffee),
-                                    (19,DeviceStringKettle)
+        ArgVersion           : ('OPTION',"Version",[(0x18,"iKettle 2.0"),
+                                    (0x19,DeviceStringKettle),
+                                    (0x20,DeviceStringCoffee),
+                                    (0x22,DeviceStringCoffee)
+                                    
                                     ]
                               ),
         ArgRelayVersion      : ('OPTION',"Version",[(1,"iBrew Relay Snow Tea")
                                     ]
                               ),
-        ArgDevice            : ('OPTION',"Appliance",[(DeviceCoffee,DeviceStringCoffee),(DeviceKettle,DeviceStringKettle)]),
+        ArgDevice            : ('OPTION',"Appliance",[(DeviceKettle,DeviceStringKettle),(DeviceCoffee,DeviceStringCoffee)]),
         ArgKettleStatus      : ('OPTION',"KettleStatus",[
                                 (KettleReady, StatusKettle[KettleReady]),
                                 (KettleHeating, StatusKettle[KettleHeating]),
@@ -2522,10 +2509,10 @@ class SmarterProtocol:
                             ]),
         ArgTemperature        : ('NUMBER',"Temperature",(0,100),"temperature in celcius [0ºC..100ºC]"),
         ArgFormulaTemperature : ('NUMBER',"FormulaTemperature",(0,100),"formula temperature in celcius [0ºC..100ºC]"),
-        ArgKeepWarm           : ('NUMBER',"Keepwarm",(5,35),"kettle keep warm time in minutes [5..35]"),
+        ArgKeepWarm           : ('NUMBER',"Keepwarm",(5,30),"kettle keep warm time in minutes [5..30]"),
         ArgKeepWarmOn         : ('OPTION',"KeepwarmOn",[(0,"Keepwarm off"),(1,"Keepwarm on")]),
 
-        ArgHotPlate           : ('NUMBER',"Hotplate",(5,30),"hotplate keep warm time in minutes [5..30]"),
+        ArgHotPlate           : ('NUMBER',"Hotplate",(5,35),"hotplate keep warm time in minutes [5..35]"),
         ArgFormula            : ('OPTION',"Formula",[(0,"Disabled"),(1,"Enabled")]),
         ArgOffBase            : ('OPTION',"Base",[(0,"Kettle on base"),(MessageOffBase,"Kettle off base")]),
         ArgRequired           : ('OPTION',"Required",[(0,"Carafe Required"),(1,"Can brew without carafe")]),
@@ -2625,7 +2612,20 @@ class SmarterProtocol:
         s += "    <" + self.ArgType[argument[2]][1].upper() + ">" + " + "
         s += "<" + self.ArgType[argument[3]][1].upper() + ">" + "\n"
         s += self.string_argument(argument[2])
-        s +=  self.string_argument(argument[3])
+        s += self.string_argument(argument[3])
+        return s
+ 
+ #UPD:
+    def string_bigint(self,argument):
+        s = ""
+        s += "    <" + self.ArgType[argument[2]][1].upper() + ">" + " + "
+        s += "<" + self.ArgType[argument[3]][1].upper() + ">" + " + "
+        s += "<" + self.ArgType[argument[4]][1].upper() + ">" + " + "
+        s += "<" + self.ArgType[argument[5]][1].upper() + ">" + "\n"
+        s += self.string_argument(argument[2])
+        s += self.string_argument(argument[3])
+        s += self.string_argument(argument[4])
+        s += self.string_argument(argument[5])
         return s
 
 
@@ -2659,6 +2659,9 @@ class SmarterProtocol:
     def string_text(self,argument):
             return "    TEXT      " + argument[2] + "\n"
 
+    def string_seperator(self,argument):
+            return "    " + argument[2] + "\n"
+            
     def string_protocol(self,argument,id):
         
         s = ""
@@ -2666,6 +2669,7 @@ class SmarterProtocol:
         s += "  " + self.message_is_type(id) + " Message " + self.number_to_code(id) + ": " + self.message_description(id) + "\n"
         s +=  "  ─────────────────────────────────────────────────────────────────────────\n"
         d = ""
+        
         if self.message_is_known(id):
             for i, iid in enumerate(self.message_connection(id)):
                 d = d + "[" + self.number_to_code(iid) + "," + self.message_description(iid) + "] "
@@ -2683,18 +2687,21 @@ class SmarterProtocol:
         if argument[3] != "":
             s += "\n  " + argument[3] + "\n"
         
+        
+
         if len(argument[1]) != 0:
             
             s += "\n\n  Arguments: "
             
             for a in argument[1]:
+                print a
+        
                 s += "<" + self.ArgType[a][1].upper() + ">"
             s += "\n"
             for a in argument[1]:
                 s += "\n" + self.string_argument(a)
 
 
-    
         s += "\n\n  Example: [" + self.number_to_code(id) + argument[2] + self.number_to_code(self.MessageTail) + "]"
         return s + "\n\n"
 
@@ -2724,10 +2731,14 @@ class SmarterProtocol:
                 s += self.string_combined(a)
             elif a[0] == 'INT':
                 s += self.string_int(a)
+            elif a[0] == 'BIGINT':
+                s += self.string_bigint(a)
             elif a[0] == 'RANGE':
                 s += self.string_range(a)
+            elif a[0] == 'SEP':
+                s += self.string_seperator(a)
             else:
-                print "AAAAARRGGHHH"
+                print "Warning: Not implemented: " + a[0]
             
         else:
             s = "No information on: " + self.number_to_code(argument)
@@ -2769,10 +2780,14 @@ class SmarterProtocol:
         for id in range(0,255):
             if self.message_is_known(id):
                 s += self.string_argument(id)
+                #FIX: Last messages in description
+                self.MessagesOld(id)
         return s
 
 
     def message(self,id):
+        #FIX: Last messages in description
+        self.MessagesOld(id)
         return self.string_argument(id)
 
 
@@ -2828,7 +2843,7 @@ class SmarterProtocol:
         return """
        
        
-  Smarter iKettle 2.0 & Smarter Coffee  Protocol
+  Smarter iKettle 2.0 & Smarter Coffee Protocol
   _____________________________________________
 
     Smarter uses a binary message protocol
@@ -2860,7 +2875,7 @@ class SmarterProtocol:
         return """
 
 
-  Smarter iKettle 2.0 & Smarter Coffee  Notes
+  Smarter iKettle 2.0 & Smarter Coffee Notes
   __________________________________________
     
   WaterSensor Calibration:
@@ -2953,7 +2968,7 @@ class SmarterProtocol:
 
     def license(self):
         return """
-Copyright (c) 2016, Tristan Crispijn
+Copyright (c) 2020, Tristan Crispijn
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

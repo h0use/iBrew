@@ -235,7 +235,7 @@ class SmarterInterfaceLegacy:
         if self.dump:
             logging.info("[" + self.host + ":" + str(self.port) + "] Simulation Running")
         while self.simulator_run:
-            time.sleep(1)
+            time.sleep(2)
             
             if self.simHeaterOn:
                 self.simHeaterTimer += 1
@@ -864,7 +864,7 @@ class SmarterInterfaceLegacy:
     
     def __relay(self):
         self.relay_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # settimeout at least 2
         self.relay_socket.settimeout(5)
         try:
@@ -1593,7 +1593,7 @@ class SmarterInterface:
         #FIX: firewall or message blocking rules
         #UPD: for now block the update messages and simulate them...
         self.rulesIn                 = Smarter.MessagesUpdate #Smarter.MessagesDebug + Smarter.MessagesRest
-        self.rulesOut                = [] #Smarter.MessagesDebug + Smarter.MessagesRest + Smarter.MessagesWifi + Smarter.MessagesDeviceInfo + Smarter.MessagesCalibrateOnly # use only after setup so speed up ... + Smarter.MessagesGet + Smarter.MessagesModesGet
+        self.rulesOut                = []  #Smarter.MessagesDebug + Smarter.MessagesRest + Smarter.MessagesWifi + Smarter.MessagesDeviceInfo + Smarter.MessagesCalibrateOnly # use only after setup so speed up ... + Smarter.MessagesGet + Smarter.MessagesModesGet
 
 
         self.patchTemperatureLimitValue = 70
@@ -1865,6 +1865,7 @@ class SmarterInterface:
                         r = self.__simulate_CoffeeStatus()
                     else:
                         r = self.__encode_CoffeeStatus(self.cups,self.strength,self.cupsBrew,self.waterLevel,self.waterEnough,self.carafe, self.grind, self.ready, self.grinderOn, self.heaterOn, self.hotPlateOn,self.working,self.timerEvent)
+                
                 clientsock.send(r[0])
                 self.__clients[(clientsock, addr)].release()
                 logging.info(addr[0] + ":" + str(addr[1]) + " Status [" + Smarter.message_to_codes(r[0]) + "]")
@@ -1924,7 +1925,7 @@ class SmarterInterface:
 
     def __relay(self):
         self.relay_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # settimeout at least 2
         self.relay_socket.settimeout(2)
         
@@ -2749,7 +2750,7 @@ class SmarterInterface:
         elif id == Smarter.CommandUpdateBegin:          response = self.__simulate_UpdateBegin()
         elif id == Smarter.CommandUpdateBlock:          response = self.__simulate_UpdateBlock(message)
         elif id == Smarter.CommandUpdateEnd:            response = self.__simulate_UpdateEnd(message)
-        elif id == Smarter.CommandWifiSignal:           response = self.__simulate_WifiSignal()
+        elif id == Smarter.CommandWifiSignal:           response = self.__simulate_WifiSignal(message)
         elif id == Smarter.CommandWifiFirmware:         response = self.__simulate_WifiFirmware()
         elif id == Smarter.CommandWifiNetwork:          response = self.__simulate_WifiNetwork()
         elif id == Smarter.CommandWifiPassword:         response = self.__simulate_WifiPassword()
@@ -3619,7 +3620,7 @@ class SmarterInterface:
         Simulate response on command wireless signal strength
         """
         try:
-            Smarter(Smarter.raw_to_signal(message[1]))
+            Smarter.raw_to_signal(message[1])
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
         return self.__encode_CommandStatus(Smarter.StatusSucces)

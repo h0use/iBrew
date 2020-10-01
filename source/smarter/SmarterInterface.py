@@ -71,7 +71,7 @@ def _threadsafe_function(fn):
 
 
 
-class SmarterInterfaceLegacy():
+class SmarterInterfaceLegacy:
 
     def __init(self):
     
@@ -839,7 +839,7 @@ class SmarterInterfaceLegacy():
             self.__clients[(clientsock, addr)].release()
         logging.info("[" + self.relayHost + ":" + str(self.relayPort) + "] [" + addr[0] + ":" + str(addr[1]) + "] Legacy client disconnected")
         clientsock.close()
-        del self.__clients[(clientsock, addr)]
+        #del self.__clients[(clientsock, addr)]
        
 
     def __relaySend(self,status):
@@ -849,7 +849,7 @@ class SmarterInterfaceLegacy():
             
             #FIX: SHOUL REALLY FIX THE LOCKS ON SENDING!!!
             
-            #self.__clients[i].acquire()
+            self.__clients[i].acquire()
             logging.debug("[" + self.host + ":" + str(self.port)  + "] [" + self.relayHost + ":" + str(self.relayPort) + "] [" + i[1][0] + ":" + str(i[1][1]) + "] Legacy response relay [" + status + "] " + SmarterLegacy.string_response(status))
             
             try:
@@ -859,12 +859,12 @@ class SmarterInterfaceLegacy():
                 self.__clients[i].release()
                 del self.__clients[i]
                 break
-            #self.__clients[i].release()
+            self.__clients[i].release()
     
     
     def __relay(self):
         self.relay_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # settimeout at least 2
         self.relay_socket.settimeout(5)
         try:
@@ -1394,7 +1394,8 @@ class SmarterInterface:
         self.__read_triggers()
         self.__read_block()
         
-    
+        self.firmware_update = False
+        self.firmware = ""
     
         # device
         self.historySuccess             = 0
@@ -1427,11 +1428,6 @@ class SmarterInterface:
         self.defaultKeepWarmTime        = 0
         self.defaultFormula             = False
         self.defaultFormulaTemperature  = 75
-        
-        self.updateBusy                 = False
-        self.updateCRC                  = 0
-        self.updateBlock                = 0
-        self.updateFirmware             = None
         
         # coffee
         self.waterLevel                 = Smarter.CoffeeWaterFull
@@ -1853,7 +1849,7 @@ class SmarterInterface:
     def __relayMonitor(self,clientsock,addr):
         while self.relay:
             time.sleep(1)
-            if  not self.__clients[(clientsock, addr)].locked():
+            if not self.firmware_update and not self.__clients[(clientsock, addr)].locked():
                 self.__clients[(clientsock, addr)].acquire()
                 
                 #FIX: BLOCKING HERE
@@ -1872,7 +1868,6 @@ class SmarterInterface:
                 clientsock.send(r[0])
                 self.__clients[(clientsock, addr)].release()
                 logging.info(addr[0] + ":" + str(addr[1]) + " Status [" + Smarter.message_to_codes(r[0]) + "]")
-
 
 
     def __relayHandler(self,clientsock,addr):
@@ -1929,17 +1924,20 @@ class SmarterInterface:
 
     def __relay(self):
         self.relay_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        #self.relay_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # settimeout at least 2
         self.relay_socket.settimeout(2)
+        
         try:
             self.relay_socket.bind((self.relayHost,self.relayPort))
             self.relay_socket.listen(20)
-        except socket.error:
+        except socket.error, e:
+            print str(e)
             return
         except Exception:
+            print str(e)
             return
- 
+        
         self.__broadcast_device_start()
 
         logging.info("[" + self.host + "] Relay Server (" + self.relayHost + ":" + str(self.relayPort) + ")")
@@ -2131,6 +2129,7 @@ class SmarterInterface:
                 # debug
                 #print "[" + Smarter.number_to_code(id) + "]",
                 minlength = Smarter.message_response_length(id)
+                
                 i = 1
                 while raw != Smarter.number_to_raw(Smarter.MessageTail) or (minlength > 0 and raw == Smarter.number_to_raw(Smarter.MessageTail) and i < minlength):
                     message += raw
@@ -3537,11 +3536,12 @@ class SmarterInterface:
 
 
 
-    def __simulate_Network(self):
+    def __simulate_WifiNetwork(self):
         """
         Simulate response on commandset wireless network name
         """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
+
 
 
     def __simulate_UpdateInit(self):
@@ -3556,6 +3556,12 @@ class SmarterInterface:
         """
         Simulate response on command UpdateBegin
         """
+        self.firmware_update = True
+        self.firmware = "firmware-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S") + ".bin"
+        try:
+            os.remove("firmware.bin.part")
+        except:
+            pass
         return self.__encode_CommandStatus(Smarter.StatusSucces)
      
 
@@ -3564,6 +3570,19 @@ class SmarterInterface:
         """
         Simulate response on command UpdateBlock
         """
+        if not self.firmware_update:
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
+        
+        block = Smarter.raw_to_number(message[1])
+        size  = Smarter.raw_to_number(message[2]) * 256 + Smarter.raw_to_number(message[3])
+        
+        if Smarter.raw_to_number(message[4]) != 0x7d or Smarter.raw_to_number(message[-1]) != 0x7e or Smarter.raw_to_number(message[-2]) != 0x7e or Smarter.raw_to_number(message[-3]) != 0x7e:
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
+            
+        data = message[5:-3]
+        fw = open("firmware.bin.part","ab")
+        fw.write(data)
+        fw.close()
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
@@ -3572,6 +3591,25 @@ class SmarterInterface:
         """
         Simulate response on command UpdateEnd
         """
+        if not self.firmware_update:
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
+            
+        message_crc = Smarter.raw_to_number(message[1]) * 256 * 256 * 256 + Smarter.raw_to_number(message[2]) * 256 * 256 + Smarter.raw_to_number(message[3]) * 256 + Smarter.raw_to_number(message[4])
+        
+        firmware_crc = 0
+        firmware_size = os.stat("firmware.bin.part").st_size
+        fw = open("firmware.bin.part","rb")
+        data = bytearray(fw.read(firmware_size))
+        for i in range(firmware_size):
+            firmware_crc = (firmware_crc + data[i]) % 0xFFFFFFFF
+        fw.close()
+        
+        if firmware_crc != message_crc:
+            os.delete("firmware.bin.part")
+            return self.__encode_CommandStatus(Smarter.StatusSucces)
+            
+        os.rename("firmware.bin.part",self.firmware)
+        self.firmware_update = False
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
@@ -4952,7 +4990,6 @@ class SmarterInterface:
         """
         Retreive the default values
         """
-        
         self.__sendLock.acquire()
         try:
             self.fast = False

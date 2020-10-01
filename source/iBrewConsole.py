@@ -44,8 +44,8 @@ import traceback
 
 
 iBrewApp          = "iBrew - Smarter Appliances Interface"
-iBrewInfo         = "2020 - Aye! © 2020 Tristan Crispijn (tristan@monkeycat.nl). All Rights Reserved"
-iBrewContribute   = "Please DONATE! Food, jokes, hugs and fun toys! To your favaroite cat!\n\nContribute any discoveries on https://github.com/Tristan79/iBrew/issues"
+iBrewInfo         = "20.20 - Aye! © 2020 Tristan Crispijn (tristan@monkeycat.nl). All Rights Reserved"
+iBrewContribute   = "Please DONATE! Food, jokes, hugs and fun toys! To your favorite cat!\n\nContribute any discoveries on https://github.com/Tristan79/iBrew/issues"
 
 class iBrewConsole:
 
@@ -336,7 +336,7 @@ class iBrewConsole:
                     else:
                         return
 
-
+            
             self.haveHost = False
             self.serverBind = ""
             self.serverPort = Smarter.Port - 1
@@ -396,7 +396,7 @@ class iBrewConsole:
                 command = arguments[0].lower()
                 arguments = arguments[1:]
                 numarg -= 1
-                # ip port?
+                #FIX: ip port?
                 self.client.emulate()
             
             
@@ -473,24 +473,24 @@ class iBrewConsole:
                     if self.console:
                         print "iBrew: Temperature in celsius"
                         return
-
-
+            
             if numarg > 0:
                 connection = str.split(arguments[numarg-1],':')
                 if self.is_valid_ipv4_address(connection[0]) or self.is_valid_ipv6_address(connection[0]) or (("server" in arguments or command == "server" or "relay" in arguments or command == "relay") and connection[0] == ""):
                     
                     if "relay" in arguments or command == "relay" or "server" in arguments or command == "server" or "web" in arguments or command == "web":
-                        self.serverBind = connection[0]
+                        #self.serverBind = connection[0]
                         if "relay" in arguments or command == "relay":
                             if command == "legacy":
                                 self.client.iKettle.relayHost = self.serverBind
                             else:
+                                print "DDDD"
                                 self.client.relayHost = self.serverBind
+                    # NO ELSE HERE!!!!
+                    if command == "legacy":
+                        self.client.iKettle.setHost(connection[0])
                     else:
-                        if command == "legacy":
-                            self.client.iKettle.setHost(connection[0])
-                        else:
-                            self.client.setHost(connection[0])
+                        self.client.setHost(connection[0])
                     try:
                         self.portfound = False
                         p = int(connection[1])
@@ -503,11 +503,11 @@ class iBrewConsole:
                                 else:
                                     self.client.relayPort = self.serverPort
                             self.portfound = True
+                        # NO ELSE HERE...
+                        if command == "legacy":
+                            self.client.iKettle.port = p
                         else:
-                            if command == "legacy":
-                                self.client.iKettle.port = p
-                            else:
-                                self.client.port = p
+                            self.client.port = p
                     except ValueError:
                         pass
                     except IndexError:
@@ -516,20 +516,7 @@ class iBrewConsole:
                         self.haveHost = True
                     numarg -= 1
                     arguments = arguments[0:numarg]
-
-                    """
-                    print "Server"
-                    print self.serverBind
-                    print str(self.serverPort)
-                    print "Normal"
-                    print self.client.host
-                    print str(self.client.port)
-                    print "iKettle"
-                    print self.client.iKettle.host
-                    print str(self.client.iKettle.port)
-                    print
-                    """
-
+                    
                     if numarg > 0 and ("relay" in arguments or command == "relay" or "server" in arguments or command == "server" or "web" in arguments or command == "web"):
                         connection = str.split(arguments[numarg-1],':')
 
@@ -542,7 +529,6 @@ class iBrewConsole:
                             noport = True
                         except IndexError:
                             noport = True
-
 
                         isvalid = self.is_valid_ipv4_address(connection[0]) or self.is_valid_ipv6_address(connection[0])
                         if connection[0] == "" or (not noport and isvalid):
@@ -624,7 +610,7 @@ class iBrewConsole:
 
                             numarg -= 1
                             arguments = arguments[0:numarg]
-        
+            
             """
             print "Server"
             print self.serverBind
@@ -636,9 +622,9 @@ class iBrewConsole:
             print self.client.iKettle.host
             print str(self.client.iKettle.port)
             print
+            #return
             """
-
-
+            
             # 3 times I went bug hunting forgotting the "s"
             if command == "event": command = "events"
             if command == "events" or command == "domoticz":
@@ -663,7 +649,7 @@ class iBrewConsole:
                     self.client.iKettle.events = True
                     if command != "domoticz":
                         command = "monitor"
-
+            
             if command == "legacy":
                 if numarg == 0:
                     self.legacy()
@@ -793,10 +779,8 @@ class iBrewConsole:
                 self.app_info()
                 self.joke()
 
-
             if command == "monitor" or command == "events":
                 self.client.fast = False
-
 
             if (command == "relay" and not self.console) or ((not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "server" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "groups" and command != "group" and command != "examples" and command != "switches" and command != "triggers" and command != "messages" and command != "rules" and command != "rule" and command != "web" and command != "legacy"  and command != "trigger"):
 

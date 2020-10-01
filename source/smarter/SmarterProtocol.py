@@ -644,6 +644,9 @@ class SmarterProtocol:
 
 
     # format: kettle?, coffee? (None is unnknown), minimal length (0 = variable), response to command, description
+    
+    #UPD: response messages
+    
     ResponseMessages = {
         #incomplete? ... chech the first one...
         ResponseCommandStatus   : (True,True,3,[CommandDeviceTime,CommandWifiNetwork,CommandWifiPassword,CommandResetSettings,CommandHeat,CommandKettleStop,CommandHeatFormula,CommandKettleStoreSettings,Command20,CommandHeatDefault,Command22,Command23,CommandBase,CommandCalibrate,CommandWifiSignal,CommandStoreTimer,CommandTimers,CommandDisableTimer,Command30,CommandSetCarafe,CommandSetMode,CommandStrength,CommandCups,CommandGrinder,CommandHotplateOn,CommandMode,CommandCarafe,CommandHotplateOff,CommandCoffeeSettings,CommandBrew,CommandCoffeeStop,CommandBrewDefault],"Command status",[]),
@@ -2394,7 +2397,7 @@ class SmarterProtocol:
         ArgNumber8BitA              : ('NUMBER',"First 8 bits",(0,255),""),
         ArgUpdateSeperatorBegin     : ('SEP',"UpdateSeperator Begin","7D",""),
         ArgUpdateSeperatorEnd       : ('SEP',"UpdateSeperator End","7E7E",""),
-        ArgSizeData                 : ('INT',"Size",ArgNumber8BitB,ArgNumber8BitA,""),
+        ArgSizeData                 : ('INT',"Size",ArgNumber8BitB,ArgNumber8BitA,"Is always 256"),
         ArgBlockNumber              : ('NUMBER',"Block Number",(0,255),""),
         
         ArgUpdateCRC                : ('BIGINT',"CRC",ArgNumber8BitD,ArgNumber8BitC,ArgNumber8BitB,ArgNumber8BitA),

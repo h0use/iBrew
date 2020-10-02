@@ -1397,7 +1397,21 @@ class SmarterProtocol:
     def raw_to_signal(self,raw):
         return self.string_to_signal(self.raw_to_number(raw))
       
-    
+   
+    #------------------------------------------------------
+    # UPDATE ARGUMENT WRAPPER (LONG_TO_RAW/INT_TO_RAW)
+    #------------------------------------------------------
+    #UPD:
+    def crc_to_raw(self,crc):
+        return Smarter.number_to_raw(crc / (256 * 256 * 256)) +
+            Smarter.number_to_raw((crc / (256 * 256)) % 256) +
+            Smarter.number_to_raw((crc / 256) % 256) +
+            Smarter.number_to_raw(crc % 256)
+
+    def size_to_raw(self,size):
+        return
+            Smarter.number_to_raw(crc / 256) +
+            Smarter.number_to_raw(crc % 256)
     #FIX: THIS INTO TWO DIFFERENT EXCEPTION INT & TEMPCHECK
 
     #------------------------------------------------------
@@ -2397,7 +2411,7 @@ class SmarterProtocol:
         ArgNumber8BitA              : ('NUMBER',"First 8 bits",(0,255),""),
         ArgUpdateSeperatorBegin     : ('SEP',"UpdateSeperator Begin","7D",""),
         ArgUpdateSeperatorEnd       : ('SEP',"UpdateSeperator End","7E7E",""),
-        ArgSizeData                 : ('INT',"Size",ArgNumber8BitB,ArgNumber8BitA,"Is always 256"),
+        ArgSizeData                 : ('INT',"Size",ArgNumber8BitB,ArgNumber8BitA,"Is always 256???"),
         ArgBlockNumber              : ('NUMBER',"Block Number",(0,255),""),
         
         ArgUpdateCRC                : ('BIGINT',"CRC",ArgNumber8BitD,ArgNumber8BitC,ArgNumber8BitB,ArgNumber8BitA),
@@ -2618,7 +2632,7 @@ class SmarterProtocol:
         s += self.string_argument(argument[3])
         return s
  
- #UPD:
+ 
     def string_bigint(self,argument):
         s = ""
         s += "    <" + self.ArgType[argument[2]][1].upper() + ">" + " + "

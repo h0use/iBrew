@@ -1394,9 +1394,16 @@ class SmarterInterface:
         self.__read_triggers()
         self.__read_block()
         
-        self.firmware_update = False
-        self.firmware = ""
+        self.receive_firmware_update = False
+        self.receive_firmware = ""
     
+    #UPD:
+        self.send_firmware_update = False
+        self.send_firmware = None
+        self.send_firmware_crc = 0
+        self.send_firmware_block = 0
+        
+        
         # device
         self.historySuccess             = 0
         
@@ -1849,7 +1856,7 @@ class SmarterInterface:
     def __relayMonitor(self,clientsock,addr):
         while self.relay:
             time.sleep(1)
-            if not self.firmware_update and not self.__clients[(clientsock, addr)].locked():
+            if not self.receive_firmware_update and not self.__clients[(clientsock, addr)].locked():
                 self.__clients[(clientsock, addr)].acquire()
                 
                 #FIX: BLOCKING HERE
@@ -3557,8 +3564,8 @@ class SmarterInterface:
         """
         Simulate response on command UpdateBegin
         """
-        self.firmware_update = True
-        self.firmware = "firmware-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S") + ".bin"
+        self.receive_firmware_update = True
+        self.receive_firmware = "firmware-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S") + ".bin"
         try:
             os.remove("firmware.bin.part")
         except:
@@ -3571,7 +3578,7 @@ class SmarterInterface:
         """
         Simulate response on command UpdateBlock
         """
-        if not self.firmware_update:
+        if not self.receive_firmware_update:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
         
         block = Smarter.raw_to_number(message[1])
@@ -3592,7 +3599,7 @@ class SmarterInterface:
         """
         Simulate response on command UpdateEnd
         """
-        if not self.firmware_update:
+        if not self.receive_firmware_update:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
             
         message_crc = Smarter.raw_to_number(message[1]) * 256 * 256 * 256 + Smarter.raw_to_number(message[2]) * 256 * 256 + Smarter.raw_to_number(message[3]) * 256 + Smarter.raw_to_number(message[4])
@@ -3609,8 +3616,8 @@ class SmarterInterface:
             os.delete("firmware.bin.part")
             return self.__encode_CommandStatus(Smarter.StatusSucces)
             
-        os.rename("firmware.bin.part",self.firmware)
-        self.firmware_update = False
+        os.rename("firmware.bin.part",self.receive_firmware)
+        self.receive_firmware_update = False
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
@@ -5188,7 +5195,7 @@ class SmarterInterface:
 #UPD:
     def device_update_init(self):
         """
-        Enters update mode (do not use)
+        Enters update mode
         """
         self.__send_command(Smarter.CommandUpdateInit)
    
@@ -5196,26 +5203,63 @@ class SmarterInterface:
 
     def device_update_begin(self,firmware):
         """
-        Enters update mode begin (do not use)
+        Enters update mode begin
+        firmware is path to binary file
         """
-        self.__send_command(Smarter.CommandUpdateBegin)
+        if not os.path.exists(firmware):
+            logging.error("[" + self.host + "] No such file: " + firmware)
+        elif not os.access(firmware, os.R_OK):
+            logging.error("[" + self.host + "] Access denied: " + firmware)
+        else:
+            self.__send_command(Smarter.CommandUpdateBegin)
+            self.send_firmware_update = True
+            self.send_firmware = firmware
+            self.send_firmware_crc = 0
+            self.send_firmware_block = 0
 
 
 
-    def device_update_block(self,crc,blocknumber,data):
+    def device_update_block(self):
         """
-        Enters update mode (do not use)
+        Upload block of data from firmware
         """
-        self.__send_command(Smarter.CommandUpdateBlock)
-
+        if not self.send_firmware_update:
+            logging.warning("[" + self.host + "] Not in firmware update mode")
+        else:
+            data = None
+            size = 256
+            try:
+                fw = open(self.send_firmware,"rb")
+                fw.seek(self.send_firmware_block * size)
+            except:
+                logging.error("[" + self.host + "] There is a problem with the firmware file while uploading (reset: iKettle: Hold Button when powering on, Smarter Coffee: Hold the Beans and Start button when powering on) try again")
+                self.send_firmware_update = False
+                break
+            
+            data = bytearray(fw.read(size))
+            if not data:
+                logging.error("[" + self.host + "] There is a problem reading the firmware file while uploading (reset: iKettle: Hold Button when powering on, Smarter Coffee: Hold the Beans and Start button when powering on) try again")
+                self.send_firmware_update = False
+                break
+            data.extend(bytearray([0]*(size-len(data))) )
+            for i in range(size):
+                self.send_firmware_crc = (self.send_firmware_crc + data[i]) % 0xFFFFFFFF
+            self.__send_command(Smarter.CommandUpdateBlock,Smarter.number_to_raw(self.send_firmware_block) + Smarter.number_to_size(size) + Smarter.number_to_raw(0x7d) + data + Smarter.number_to_raw(0x7e) + Smarter.number_to_raw(0x7e) + Smarter.number_to_raw(0x7e))
+            self.send_firmware_block += 1
+            
 
 
     def device_update_end(self,crc):
         """
-        Enters update mode (do not use)
+        End update mode
         """
-        self.__send_command(Smarter.CommandUpdateEnd)
-        # update
+        if not self.send_firmware_update:
+            logging.warning("[" + self.host + "] Not in update firmware mode")
+        else:
+            self.__send_command(Smarter.CommandUpdateEnd,Smarter.crc_to_raw(self.send_firmware_crc))
+            self.send_firmware = None
+            self.send_firmware_crc = 0
+            self.send_firmware_update = False
 
 
     def device_time_now(self):

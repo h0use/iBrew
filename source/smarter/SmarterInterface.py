@@ -5234,13 +5234,13 @@ class SmarterInterface:
             except:
                 logging.error("[" + self.host + "] There is a problem with the firmware file while uploading (reset: iKettle: Hold Button when powering on, Smarter Coffee: Hold the Beans and Start button when powering on) try again")
                 self.send_firmware_update = False
-                break
+                return
             
             data = bytearray(fw.read(size))
             if not data:
                 logging.error("[" + self.host + "] There is a problem reading the firmware file while uploading (reset: iKettle: Hold Button when powering on, Smarter Coffee: Hold the Beans and Start button when powering on) try again")
                 self.send_firmware_update = False
-                break
+                return
             data.extend(bytearray([0]*(size-len(data))) )
             for i in range(size):
                 self.send_firmware_crc = (self.send_firmware_crc + data[i]) % 0xFFFFFFFF

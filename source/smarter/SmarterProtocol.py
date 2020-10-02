@@ -1403,15 +1403,19 @@ class SmarterProtocol:
     #------------------------------------------------------
     #UPD:
     def crc_to_raw(self,crc):
-        return Smarter.number_to_raw(crc / (256 * 256 * 256)) +
+        return None
+        """
+        Smarter.number_to_raw(crc / (256 * 256 * 256)) +
             Smarter.number_to_raw((crc / (256 * 256)) % 256) +
             Smarter.number_to_raw((crc / 256) % 256) +
             Smarter.number_to_raw(crc % 256)
-
+        """
     def size_to_raw(self,size):
-        return
+        return None
+        """
             Smarter.number_to_raw(crc / 256) +
             Smarter.number_to_raw(crc % 256)
+        """
     #FIX: THIS INTO TWO DIFFERENT EXCEPTION INT & TEMPCHECK
 
     #------------------------------------------------------

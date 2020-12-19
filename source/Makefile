@@ -81,7 +81,7 @@ pyinstallerwin:
 	@distro\win\pyinstaller.bat
 
 pyinstallerlin:
-	@distro/lin/pyinstaller.sh
+	@distro/linux/pyinstaller.sh
 
 pyinstallermac:
 	@distro/mac/pyinstaller.sh

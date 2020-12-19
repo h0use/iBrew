@@ -533,6 +533,7 @@ class iBrewConsole:
                         isvalid = self.is_valid_ipv4_address(connection[0]) or self.is_valid_ipv6_address(connection[0])
                         if connection[0] == "" or (not noport and isvalid):
 
+                            """
                             if self.serverBind == "":
                                 if command == "legacy":
                                     self.client.iKettle.setHost(Smarter.DirectHost)
@@ -554,6 +555,7 @@ class iBrewConsole:
                                     self.client.iKettle.port = SmarterLegacy.Port
                                 else:
                                     self.client.port = Smarter.Port
+                            """
                             
                             self.haveHost = True
                             if not noport:

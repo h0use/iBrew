@@ -78,7 +78,7 @@ bonjourwintry:
 
 
 pyinstallerwin:
-	@distro\win\pyinstaller.bat
+	@distro\windows\pyinstaller.bat
 
 pyinstallerlin:
 	@distro/linux/pyinstaller.sh
@@ -98,7 +98,7 @@ cleanlin:
 
 cleanwin:
 	@echo iBrew: Cleaning up [Windows]
-	@distro\win\cleanwin.bat     
+	@distro\windows\cleanwin.bat     
  
 cleanmac:
 	@echo iBrew: Cleaning up [MacOS]
@@ -117,17 +117,17 @@ buildlin:
 	@pyinstaller ibrew
 
 installer:
-	@echo !define RELEASE_STR v0.5.0.1 > distro\win\release.nsh
+	@echo !define RELEASE_STR v0.5.0.1 > distro\windows\release.nsh
 	@copy LICENSE distro\win
-	@"%PROGRAMFILES%\NSIS\makensis.exe" distro\win\ibrew.nsi
+	@"%PROGRAMFILES%\NSIS\makensis.exe" distro\windows\ibrew.nsi
 	@mkdir release
-	@copy distro\win\iBrew.exe release
-	@del distro\win\iBrew.exe 
+	@copy distro\windows\iBrew.exe release
+	@del distro\windows\iBrew.exe 
 
 buildwin:
 	@echo iBrew: Building Windows package    
-	@pyinstaller -c --version-file distro\win\version.py -i resources\favicon.ico ibrew
-	@pyinstaller -w --version-file distro\win\version.py -i resources\favicon.ico ibrewui
+	@pyinstaller -c --version-file distro\windows\version.py -i resources\favicon.ico ibrew
+	@pyinstaller -w --version-file distro\windows\version.py -i resources\favicon.ico ibrewui
 	@mkdir dist\ibrew\resources
 	@mkdir dist\ibrew\interface
 	@xcopy /S resources dist\ibrew\resources

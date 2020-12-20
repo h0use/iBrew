@@ -1404,7 +1404,7 @@ class iBrewWeb(tornado.web.Application):
         self.isRunning = False
         self.dump = dump
         self.host = host
-        self.sport = port
+        self.sport = sport
         self.bind = bind
         
         try:

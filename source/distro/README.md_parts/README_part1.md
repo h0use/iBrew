@@ -18,12 +18,9 @@ Such that all features of iBrew are available (if supported) for the original iK
 
 So if you have an original iKettle filled up with water! And some time to spare!
 
-Contact <tristan@monkeycat.nl>!
 
 ## Needed help with Website layout! CSS!
 Were talking about CSS for tablet, phones and displays... *ugh*. 
-
-Contact <tristan@monkeycat.nl>!
 
 
 ## Downloads
@@ -91,7 +88,6 @@ __For the Smarthome and Domotics Interface experts!__
 
 Tested on iKettle 2.0 v19 and SmarterCoffee v20 & v22. 
 
-<tristan@monkeycat.nl>
 
 Please share any bugs, jokes, problems, discoveries you made! 
 

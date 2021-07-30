@@ -108,8 +108,6 @@ Since the console it nearly done, protocol almost fully mapped out. It is time t
 ## Contact
 [Bugs or issues](https://github.com/Tristan79/iBrew/issues). 
 
-<tristan@monkeycat.nl>
-
 If you have jokes on coffee, tea, hot chocolade, coffee machines or kettles, please post in the issues!
 
 ## Other Nice Smarthome stuff!!

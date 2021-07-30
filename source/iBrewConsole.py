@@ -44,7 +44,7 @@ import traceback
 
 
 iBrewApp          = "iBrew - Smarter Appliances Interface"
-iBrewInfo         = "20.20 - Aye! © 2020 Tristan Crispijn (tristan@monkeycat.nl). All Rights Reserved"
+iBrewInfo         = "20.20 - Aye! © 2020 Tristan Crispijn. All Rights Reserved"
 iBrewContribute   = "Please DONATE! Food, jokes, hugs and fun toys! To your favorite cat!\n\nContribute any discoveries on https://github.com/Tristan79/iBrew/issues"
 
 class iBrewConsole:

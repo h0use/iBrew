@@ -12,7 +12,6 @@ import datetime
 import os
 from smarter.SmarterInterface import *
 
-from iBrewBonjour import *
 from iBrewJokes import *
 from iBrewFolders import AppFolders
 
@@ -57,7 +56,7 @@ class GenericAPIHandler(BaseHandler):
         self.add_header("Content-type","application/json; charset=UTF-8")
 
     def validateAPIKey(self):
-        api_key = self.get_argument(u"apikey", default="")
+        api_key = self.get_argument("apikey", default="")
         if api_key == "APIKEY":
             return True
         else:
@@ -1026,7 +1025,7 @@ class TriggerHandler(GenericAPIHandler):
             try:
                 client.triggerAdd(group,trigger,http+url)
                 response = { 'command' : 'success' }
-            except Exception, e:
+            except Exception as e:
                 response = { 'error' : str(e) }
         else:
             response = { 'error': 'no device' }
@@ -1043,7 +1042,7 @@ class UnTriggerHandler(GenericAPIHandler):
             try:
                 client.triggerDelete(group,trigger)
                 response = { 'command' : 'success' }
-            except Exception, e:
+            except Exception as e:
                 response = { 'error' : str(e) }
         else:
             response = { 'error': 'no device' }
@@ -1059,7 +1058,7 @@ class GroupUnTriggerHandler(GenericAPIHandler):
             try:
                 client.triggerGroupDelete(group)
                 response = { 'command' : 'success' }
-            except Exception, e:
+            except Exception as e:
                 response = { 'error' : str(e) }
         else:
             response = { 'error': 'no device' }
@@ -1205,7 +1204,7 @@ class LegacyHandler(GenericAPIHandler):
                         client.iKettle.send(command)
                     response = encodeLegacy(client.iKettle)
                 #FIX: for right exception
-                except Exception, e:
+                except Exception as e:
                     response = { 'error' : 'failed to send command' }
             else:
                 response = { 'error': 'need kettle' }
@@ -1225,8 +1224,8 @@ class LegacyRawHandler(GenericAPIHandler):
                 try:
                     response = str(client.iKettle.eventStringRaw(command))
                 #FIX: for right exception
-                except Exception, e:
-                    print str(e)
+                except Exception as e:
+                    print(str(e))
                 # raise 404
         self.write(response)
 
@@ -1239,8 +1238,8 @@ class RawHandler(GenericAPIHandler):
             try:
                 response = str(client.eventStringRaw(command))
             #FIX: for right exception
-            except Exception, e:
-                print str(e)
+            except Exception as e:
+                print(str(e))
                 # raise 404
         self.write(response)
 
@@ -1266,7 +1265,7 @@ class iBrewWeb(tornado.web.Application):
         
         reconnect = 7
         
-        for ip in self.clients.keys():
+        for ip in list(self.clients.keys()):
             client = self.clients[ip]
             #print "Checking " + ip
             if not client.connected:
@@ -1279,7 +1278,7 @@ class iBrewWeb(tornado.web.Application):
                         client.connect()
                         try:
                             threading.Thread(target=client.device_all_settings)
-                        except Exception, e:
+                        except Exception as e:
                             logging.info(e)
                     except Exception:
                         client.disconnect()
@@ -1393,7 +1392,7 @@ class iBrewWeb(tornado.web.Application):
 
         try:
             if self.thread:
-                if self.thread.isAlive():
+                if self.thread.is_alive():
                     self.thread.join()
         except Exception:
             raise SmarterError(WebServerStopWeb,"Web Server: Could not stop webserver")
@@ -1515,12 +1514,9 @@ class iBrewWeb(tornado.web.Application):
             ]
             tornado.web.Application.__init__(self, handlers, **settings)
         except Exception:
-            print(traceback.format_exc())
+            print((traceback.format_exc()))
             self.kill()
             raise SmarterError(WebServerStartFailed,"Web Server: Couldn't start on port " + self.bind + ":" + str(self.port))
-
-        bonjour = iBrewBonjourThread(self.port)
-        bonjour.start()
 
         try:
             self.thread = threading.Thread(target=self.start)

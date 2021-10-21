@@ -7,9 +7,9 @@ import os
 import sys
 import logging
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
-from ConfigParser import *
+from configparser import *
 
 from smarter.SmarterInterface import *
 from smarter.SmarterProtocol import *
@@ -61,8 +61,8 @@ class iBrewDomoticz:
         if self.dump:
             logging.debug('iBrew: Domoticz: Opening url: %s' % (url))
         try:
-            response = urllib.urlopen(url)
-        except Exception, e:
+            response = urllib.request.urlopen(url)
+        except Exception as e:
             logging.error('iBrew: Domoticz: Failed to send data to Domoticz (%s)' % (url))
             return 'None'
         return response
@@ -176,7 +176,7 @@ class iBrewDomoticz:
         self.dump = client.dump
         self.prefix = prefix
         #client.dump = True
-        print "iBrew: Domoticz Setup"
+        print("iBrew: Domoticz Setup")
         client.device_type()
         if name == "":
             if client.isKettle: self.hardwarename = "iKettle 2.0"
@@ -189,10 +189,10 @@ class iBrewDomoticz:
         self.domoticzurl = connection
        
         
-        print "Appliance: " + Smarter.device_to_string(client.deviceId) + " [" + client.host + ":" + str(client.port) + "]"
-        print "Domoticz connection: [" + connection + "]"
+        print("Appliance: " + Smarter.device_to_string(client.deviceId) + " [" + client.host + ":" + str(client.port) + "]")
+        print("Domoticz connection: [" + connection + "]")
         if self.check_hardware():
-            print "Domoticz hardware: " + self.hardwarename + " [" + str(self.hardwareid) + "]"
+            print("Domoticz hardware: " + self.hardwarename + " [" + str(self.hardwareid) + "]")
 
 
         self.config = SafeConfigParser()

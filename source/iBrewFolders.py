@@ -41,18 +41,12 @@ class AppFolders():
 
     @staticmethod
     def userFolder():
-        
-        filename_encoding = sys.getfilesystemencoding()
-
         if platform.system() == "Windows":
             folder = os.path.join( AppFolders.windowsAppDataFolder(), appname )
         elif platform.system() == "Darwin":
             folder = os.path.join( os.path.expanduser('~') , 'Library/Application Support/'+appname)
         else:
             folder = os.path.join( os.path.expanduser('~') , '.'+appname)
-            
-        if folder is not None:
-            folder = folder.decode(filename_encoding)
         return folder
         
     @staticmethod
@@ -62,9 +56,9 @@ class AppFolders():
             if platform.system() == "Darwin":
                 return sys._MEIPASS
             else: # Windows
-                return os.path.dirname( os.path.abspath( unicode(sys.executable, encoding) ) )
+                return os.path.dirname( os.path.abspath( str(sys.executable, encoding) ) )
         else:
-            return os.path.dirname( os.path.abspath(unicode(__file__, encoding)) )
+            return os.path.dirname( os.path.abspath(__file__) )
 
     @staticmethod
     def logs():

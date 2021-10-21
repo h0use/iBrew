@@ -28,7 +28,7 @@ from iBrewWeb import *
 
 class Launcher():    
     def signal_handler(self, signal, frame):
-        print "Caught Ctrl-C.  exiting."
+        print("Caught Ctrl-C.  exiting.")
         if self.web:
             self.web.kill()
         sys.exit(-1)
@@ -43,13 +43,13 @@ class Launcher():
         
         try:
             self.web.run("",2080,True)
-        except Exception, e:
+        except Exception as e:
             logging.debug(e)
             logging.info("iBrew: Failed to run Web Interface & REST API on port 2080")
             self.web.kill()
             if self.ui:
                 self.ui.quit_application()
-            print "I never ever had problems not exiting before, fucking python... why not exit?"
+            print("I never ever had problems not exiting before, fucking python... why not exit?")
             self.exit()
             
         logging.info("iBrew: Starting Web Interface & REST API on port 2080")
@@ -93,25 +93,25 @@ class Launcher():
         #import threading
         self.t = threading.Thread(target=self.run)
         self.t.start()
-        logging.info("GUI Started")
-        try:
-            self.web.events = True
-            if platform.system() == "Darwin":
-                # For windows exe with pyinstaller disabled the following 3 lines!
-                #pass
-                from iBrewMac import MacGui
-                self.ui = MacGui(self.web)
-                self.ui.run()
-            elif platform.system() == "Windows":
-                from iBrewWin import WinGui
-                self.ui = WinGui(self.web)
-                self.ui.run()
-            else:
-                print "MacOS & Windows only"
-        except Exception:
-            if self.ui:
-                self.ui.quit_application()
-            self.web.kill()
+        # logging.info("GUI Started")
+        # try:
+        #     self.web.events = True
+        #     if platform.system() == "Darwin":
+        #         # For windows exe with pyinstaller disabled the following 3 lines!
+        #         #pass
+        #         from iBrewMac import MacGui
+        #         self.ui = MacGui(self.web)
+        #         self.ui.run()
+        #     elif platform.system() == "Windows":
+        #         from iBrewWin import WinGui
+        #         self.ui = WinGui(self.web)
+        #         self.ui.run()
+        #     else:
+        #         print("MacOS & Windows only")
+        # except Exception:
+        #     if self.ui:
+        #         self.ui.quit_application()
+        #     self.web.kill()
 
 Launcher().go()
 
